@@ -1,6 +1,6 @@
-﻿namespace PatientService.Models
+﻿namespace MicroFrontend.Models
 {
-    public class Patient
+    public class PatientViewModel
     {
         public Guid Id { get; set; }
         public string Nom { get; set; }

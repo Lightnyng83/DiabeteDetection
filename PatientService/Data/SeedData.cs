@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PatientService.Models;
 using System;
@@ -13,6 +14,8 @@ namespace PatientService.Data
             // Créer un scope pour obtenir les services
             using (var scope = serviceProvider.CreateScope())
             {
+                #region Create User
+
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -46,6 +49,55 @@ namespace PatientService.Data
                         throw new Exception("La création de l'utilisateur de test a échoué : " + string.Join(", ", result.Errors));
                     }
                 }
+
+                #endregion
+
+                #region Add Patients
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                var nom = dbContext.Patients.FirstOrDefault(p => p.Nom == "TestNone");
+                if (nom == null)
+                {
+                    dbContext.Patients.Add(new Patient
+                    {
+                        Nom = "Test",
+                        Prenom = "TestNone",
+                        DateNaissance = new DateOnly(1996, 12, 31),
+                        Adresse = "1 Brookside St",
+                        Telephone = "100-222-3333",
+                        Genre = 0
+                    });
+                    dbContext.Patients.Add(new Patient
+                    {
+                        Nom = "Test",
+                        Prenom = "TestBorderline",
+                        DateNaissance = new DateOnly(1945, 06, 24),
+                        Adresse = "2 High St",
+                        Telephone = "200-333-4444",
+                        Genre = 1
+                    });
+                    dbContext.Patients.Add(new Patient
+                    {
+                        Nom = "Test",
+                        Prenom = "TestInDanger",
+                        DateNaissance = new DateOnly(2004, 06, 18),
+                        Adresse = "3 Club Road",
+                        Telephone = "300-444-5555",
+                        Genre = 1
+                    });
+                    dbContext.Patients.Add(new Patient
+                    {
+                        Nom = "Test",
+                        Prenom = "TestEarlyOnset",
+                        DateNaissance = new DateOnly(2002, 06, 28),
+                        Adresse = "4 Valley Dr",
+                        Telephone = "400-555-6666",
+                        Genre = 0
+                    });
+                    await dbContext.SaveChangesAsync();
+                }
+
+                #endregion
             }
         }
     }

@@ -1,22 +1,16 @@
+using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Ajoute le fichier ocelot.json à la configuration
+builder.Configuration.AddJsonFile("Configuration/ocelot.json", optional: false, reloadOnChange: true);
+
+// Enregistre Ocelot avec la configuration
+builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-app.UseOcelot().Wait();
+await app.UseOcelot();
 
 app.Run();
-

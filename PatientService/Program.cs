@@ -55,7 +55,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 #region SeedData
 
 using (var scope = app.Services.CreateScope())

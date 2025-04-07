@@ -16,13 +16,15 @@ namespace MicroFrontend.Controllers
             _httpClient = httpClientFactory.CreateClient("ApiClient");
         }
 
-        // Action pour afficher la liste des patients
+        // Action pour afficher la liste des patients, en recevant le token dans l'URL
         public async Task<IActionResult> Index(string token)
         {
-            // Appel à l'API pour récupérer la liste des patients.
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            List<PatientViewModel> patients = await _httpClient.GetFromJsonAsync<List<PatientViewModel>>("patients");
+            // Ajouter le token à l'en-tête Authorization
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+            // Appel à l'API pour récupérer la liste des patients
+            List<PatientViewModel> patients = await _httpClient.GetFromJsonAsync<List<PatientViewModel>>("patients");
             return View(patients);
         }
     }

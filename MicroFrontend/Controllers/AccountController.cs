@@ -43,7 +43,7 @@ namespace MicroFrontend.Controllers
                 var token = loginResponse.Token;
 
                 // Redirection vers la page d'accueil ou une page sécurisée
-                return RedirectToAction("Index", "Patients",token);
+                return RedirectToAction("Index", "Patients", new { token = token });
             }
             else
             {

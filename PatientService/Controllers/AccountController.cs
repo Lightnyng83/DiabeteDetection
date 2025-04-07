@@ -25,10 +25,16 @@ namespace PatientService.Controllers
             _jwtSettings = jwtSettings.Value;
         }
 
+        // POST: api/account/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
-            // Vérifier les identifiants de l'utilisateur
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Vérifier que l'utilisateur existe et que le mot de passe est correct
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user == null || !(await _userManager.CheckPasswordAsync(user, model.Password)))
             {
@@ -38,29 +44,42 @@ namespace PatientService.Controllers
             // Générer le token JWT
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.UserName)
+                    new Claim(ClaimTypes.Name, user.UserName!)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
                 Issuer = _jwtSettings.Issuer,
                 Audience = _jwtSettings.Audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { Token = tokenString });
+            // Configurer les options du cookie HTTP-only
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // Nécessite HTTPS
+                SameSite = SameSiteMode.None, // IMPORTANT pour cross-origin
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes)
+            };
+            HttpContext.Response.Cookies.Append("token", tokenString, cookieOptions);
+
+
+            return Ok(new { Message = "Authentification réussie", Token = tokenString });
         }
     }
 
     public class LoginRequest
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public required string Username { get; set; }
+        public required string Password { get; set; }
     }
 }

@@ -19,13 +19,13 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 #region JWT Bearer
 
-// Charger la configuration JWT depuis appsettings.json
+// Charger la configuration JWT
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
 
-// Configurer l’authentification JWT
+// Configurer l'authentification JWT
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -33,23 +33,55 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Essayer de récupérer le token depuis le cookie "token"
+                var token = context.Request.Cookies["token"];
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
+                return Task.CompletedTask;
+            }
+        };
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = true,
             ValidIssuer = jwtSettings.Issuer,
+            ValidateAudience = true,
             ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(key)
+            ValidateLifetime = true
         };
     });
+#endregion
+
+#region CORS
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFront",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:5002")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials(); // Autorise l'envoi des cookies
+        });
+});
+
 
 #endregion
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
+app.UseCors("AllowFront");
 
 app.UseAuthentication();
 app.UseAuthorization();

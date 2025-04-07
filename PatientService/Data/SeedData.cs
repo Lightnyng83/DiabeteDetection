@@ -55,7 +55,7 @@ namespace PatientService.Data
                 #region Add Patients
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                var nom = dbContext.Patients.FirstOrDefault(p => p.Nom == "TestNone");
+                var nom = dbContext.Patients.FirstOrDefault(p => p.Nom == "Test");
                 if (nom == null)
                 {
                     dbContext.Patients.Add(new Patient

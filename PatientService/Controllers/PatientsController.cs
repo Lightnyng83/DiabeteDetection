@@ -28,7 +28,7 @@ namespace PatientService.Controllers
 
         // GET: api/patients/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Patient>> GetPatient(int id)
+        public async Task<ActionResult<Patient>> GetPatient(Guid id)
         {
             var patient = await _context.Patients.FindAsync(id);
             if (patient == null)
@@ -82,7 +82,7 @@ namespace PatientService.Controllers
 
         // DELETE: api/patients/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePatient(int id)
+        public async Task<IActionResult> DeletePatient(Guid id)
         {
             var patient = await _context.Patients.FindAsync(id);
             if (patient == null)

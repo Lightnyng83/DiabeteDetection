@@ -24,7 +24,7 @@ namespace MicroFrontend.Controllers
         }
 
         // POST: /Account/Login
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -32,18 +32,18 @@ namespace MicroFrontend.Controllers
                 return View(model);
             }
 
-            // Appel à l'API de connexion (assure-toi que l'URL correspond à ton API, par exemple via Ocelot)
+            // Appel à l'API de connexion
             var response = await _httpClient.PostAsJsonAsync("https://localhost:7090/api/account/login", model);
             if (response.IsSuccessStatusCode)
             {
-                // Récupère la réponse (le token)
                 var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-
-                // Pour tester, on peut stocker le token dans TempData ou dans la session
                 var token = loginResponse.Token;
 
-                // Redirection vers la page d'accueil ou une page sécurisée
-                return RedirectToAction("Index", "Patients", new { token = token });
+                // Stocker le token dans la Session (assurez-vous d'avoir activé la Session dans Program.cs)
+                HttpContext.Session.SetString("Token", token);
+
+                // Redirection vers la page des patients
+                return RedirectToAction("Index", "Patients");
             }
             else
             {

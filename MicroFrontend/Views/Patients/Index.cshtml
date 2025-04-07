@@ -18,6 +18,8 @@ else
             <th>Nom</th>
             <th>Prénom</th>
             <th>Date de naissance</th>
+            <th>Indice de diabète</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -27,6 +29,17 @@ else
                 <td>@patient.Nom</td>
                 <td>@patient.Prenom</td>
                 <td>@patient.DateNaissance.ToString("dd/MM/yyyy")</td>
+                <td></td>
+                <td>
+                    <!-- Lien pour consulter la fiche du patient -->
+                    <a asp-controller="Patients" asp-action="Details" asp-route-id="@patient.Id" class="btn btn-link" title="Voir">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                    <!-- Lien pour supprimer le patient, avec confirmation -->
+                    <a asp-controller="Patients" asp-action="Delete" asp-route-id="@patient.Id" class="btn btn-link" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </td>
             </tr>
         }
         </tbody>

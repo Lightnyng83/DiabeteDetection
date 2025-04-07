@@ -1,5 +1,60 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model MicroFrontend.Models.PatientViewModel
+
 @{
+    ViewData["Title"] = "Détails et modification du patient";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Details" method="post">
+    <!-- Champ caché pour l'ID du patient -->
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Nom" class="control-label"></label>
+        <input asp-for="Nom" class="form-control" />
+        <span asp-validation-for="Nom" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Prenom" class="control-label"></label>
+        <input asp-for="Prenom" class="form-control" />
+        <span asp-validation-for="Prenom" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DateNaissance" class="control-label"></label>
+        <input asp-for="DateNaissance" class="form-control" type="date" />
+        <span asp-validation-for="DateNaissance" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Genre" class="control-label"></label>
+        <select asp-for="Genre" class="form-control">
+            <option value="0" selected="@(Model.Genre == 0 ? "selected" : null)">Homme</option>
+            <option value="1" selected="@(Model.Genre == 1 ? "selected" : null)">Femme</option>
+        </select>
+        <span asp-validation-for="Genre" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Adresse" class="control-label"></label>
+        <input asp-for="Adresse" class="form-control" />
+        <span asp-validation-for="Adresse" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Telephone" class="control-label"></label>
+        <input asp-for="Telephone" class="form-control" />
+        <span asp-validation-for="Telephone" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

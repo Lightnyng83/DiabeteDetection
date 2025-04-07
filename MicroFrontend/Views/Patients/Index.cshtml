@@ -6,6 +6,12 @@
 
 <h2>@ViewData["Title"]</h2>
 
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fa fa-plus"></i> Créer un patient
+    </a>
+</p>
+
 @if(Model == null || !Model.Any())
 {
     <p>Aucun patient trouvé.</p>
@@ -36,9 +42,12 @@ else
                         <i class="fa fa-eye"></i>
                     </a>
                     <!-- Lien pour supprimer le patient, avec confirmation -->
-                    <a asp-controller="Patients" asp-action="Delete" asp-route-id="@patient.Id" class="btn btn-link" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');">
-                        <i class="fa fa-times"></i>
-                    </a>
+                    <form asp-controller="Patients" asp-action="DeletePatient" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@patient.Id" />
+                        <button type="submit" class="btn btn-link" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </form>
                 </td>
             </tr>
         }

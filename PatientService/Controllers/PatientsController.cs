@@ -75,7 +75,6 @@ namespace PatientService.Controllers
                     throw;
                 }
             }
-
             // En cas de succès, retourne 204 NoContent
             return NoContent();
         }

@@ -19,11 +19,11 @@ namespace PatientService.Data
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                // Optionnel : Création d'un rôle 'Admin' s'il n'existe pas déjà
-                var adminRole = "Admin";
-                if (!await roleManager.RoleExistsAsync(adminRole))
+                //Création d'un rôle 'Doctor' s'il n'existe pas déjà
+                var doctorRole = "Doctor";
+                if (!await roleManager.RoleExistsAsync(doctorRole))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(adminRole));
+                    await roleManager.CreateAsync(new IdentityRole(doctorRole));
                 }
 
                 // Vérifier si l'utilisateur de test existe déjà
@@ -40,12 +40,12 @@ namespace PatientService.Data
                     var result = await userManager.CreateAsync(testUser, testUserPassword);
                     if (result.Succeeded)
                     {
-                        // Ajouter l'utilisateur au rôle 'Admin'
-                        await userManager.AddToRoleAsync(testUser, adminRole);
+                        // Ajouter l'utilisateur au rôle 'Doctor'
+                        await userManager.AddToRoleAsync(testUser, doctorRole);
                     }
                     else
                     {
-                        // <span style="color: red;">Erreur :</span> La création de l'utilisateur a échoué. Vérifie les messages d'erreur.
+                        //La création de l'utilisateur a échoué. Vérifie les messages d'erreur.
                         throw new Exception("La création de l'utilisateur de test a échoué : " + string.Join(", ", result.Errors));
                     }
                 }

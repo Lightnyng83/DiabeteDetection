@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Utilise builder.Configuration directement
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    if (!Program.IsIntegrationTest)
+    if (!Program.IsIntegrationTest) // Si on est pas en test => donc en prod
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     }

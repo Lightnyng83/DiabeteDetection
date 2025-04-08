@@ -10,7 +10,6 @@ namespace MicroFrontend.Controllers
     {
         private readonly HttpClient _httpClient;
 
-        // L'HttpClient est injecté via DI (voir configuration dans Program.cs)
         public AccountController(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -39,7 +38,7 @@ namespace MicroFrontend.Controllers
                 var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
                 var token = loginResponse.Token;
 
-                // Stocker le token dans la Session (assurez-vous d'avoir activé la Session dans Program.cs)
+                // Stocker le token dans la Session 
                 HttpContext.Session.SetString("Token", token);
 
                 // Redirection vers la page des patients

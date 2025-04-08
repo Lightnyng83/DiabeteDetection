@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
+using PatientService.Repository;
 using MongoDbSettings = notesAlias::NotesService.Settings.MongoDbSettings;
 
 namespace NotesServiceTests
@@ -19,7 +20,6 @@ namespace NotesServiceTests
 
                 // Configure le client MongoDB pour les tests
                 services.AddSingleton<MongoDbSettings>();
-
                 // Configure les paramètres MongoDB pour utiliser une base de données dédiée aux tests
                 services.Configure<MongoDbSettings>(options =>
                 {

@@ -8,11 +8,28 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson;
 using NotesService.Security;
+using PatientService.Repository;
+using Microsoft.EntityFrameworkCore;
+using PatientService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-// Charger la config Mongo
+
+#region Context
+
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
+
+//Obligé d'ajouter le context de PatientService pour pouvoir faire le seed
+//car IPatientRepository est injecté dans le service NoteService
+//et nécessite le context SQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); // ou une autre chaîne pour SQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+#endregion
+// Charger la config Mongo
+
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<NoteService>();
@@ -85,9 +102,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+#region SeedData
+
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 await SeedMongoData.SeedNotesAsync(services);
+
+#endregion
 
 app.Run();
 public partial class Program

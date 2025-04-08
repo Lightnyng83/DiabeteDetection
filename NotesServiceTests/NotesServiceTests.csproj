@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NotesService\NotesService.csproj " Aliases="notesAlias" />
+    <ProjectReference Include="..\PatientService\PatientService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

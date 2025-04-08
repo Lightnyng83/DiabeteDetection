@@ -6,7 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using PatientService.Data;
 using PatientService.Models;
 using PatientService.Security;
-using Microsoft.AspNetCore.Builder; // Assure-toi d'avoir ce using
+using Microsoft.AspNetCore.Builder;
+using PatientService.Repository; // Assure-toi d'avoir ce using
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 #region JWT Bearer
 
 // Charger la configuration JWT

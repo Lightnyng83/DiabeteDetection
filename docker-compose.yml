@@ -6,18 +6,30 @@ services:
       - "5000:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+
+  
+
   ocelotgateway:
     build: ./OcelotGateway
     ports:
       - "5001:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+
   microfrontend:
     build: ./MicroFrontend
     ports:
       - "5002:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+
+  notesservice:
+    build: ./NotesService
+    ports:
+    - "5003:80"
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
@@ -25,3 +37,13 @@ services:
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
+
+      # MongoDB service
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      # Ces variables sont optionnelles, à configurer si besoin
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123

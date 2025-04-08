@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PatientService;
-using PatientService.Data;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using ApplicationDbContext = PatientService.Data.ApplicationDbContext;
 
 namespace PatientServiceTests
 {

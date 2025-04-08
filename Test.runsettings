@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!-- Désactiver l'utilisation d'un AppDomain séparé -->
+    <DisableAppDomain>true</DisableAppDomain>
+    <!-- Désactiver le Shadow Copy -->
+    <DisableShadowCopy>true</DisableShadowCopy>
+  </RunConfiguration>
+</RunSettings>

@@ -6,17 +6,23 @@ using Microsoft.IdentityModel.Tokens;
 using PatientService.Data;
 using PatientService.Models;
 using PatientService.Security;
+using Microsoft.AspNetCore.Builder; // Assure-toi d'avoir ce using
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Utilise builder.Configuration directement
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (!Program.IsIntegrationTest)
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+});
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
 #region JWT Bearer
 
 // Charger la configuration JWT
@@ -78,15 +84,16 @@ builder.Services.AddCors(options =>
 
 #endregion
 
+builder.Services.AddRouting();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-app.UseCors("AllowFront");
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
+app.UseRouting(); // D'abord le routage
+app.UseCors("AllowFront"); // Puis CORS si nécessaire
+app.UseAuthentication(); // Puis l'authentification
+app.UseAuthorization();  // Puis l'autorisation
+app.MapControllers();    // Enfin, mapper les contrôleurs
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -110,5 +117,11 @@ using (var scope = app.Services.CreateScope())
 #endregion
 
 app.Run();
+
+public partial class Program
+{
+    public static bool IsIntegrationTest { get; set; } = false;
+
+}
 
 

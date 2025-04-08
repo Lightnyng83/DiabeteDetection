@@ -2,6 +2,7 @@
 using NotesService.Models;
 using NotesService.Settings;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 
 namespace NotesService.Services
 {
@@ -27,9 +28,16 @@ namespace NotesService.Services
         }
 
         public async Task<Note?> GetNoteAsync(string id)
-            => await _notesCollection.Find(n => n.Id == id).FirstOrDefaultAsync();
+        {
+            // Si l'ID n'est pas un ObjectId valide, retournez null
+            if (!ObjectId.TryParse(id, out _))
+                return null;
 
-        public async Task UpdateNoteAsync(string id, Note updatedNote)
+            return await _notesCollection.Find(n => n.Id == id).FirstOrDefaultAsync();
+        }
+
+
+    public async Task UpdateNoteAsync(string id, Note updatedNote)
             => await _notesCollection.ReplaceOneAsync(n => n.Id == id, updatedNote);
 
         public async Task DeleteNoteAsync(string id)

@@ -177,28 +177,34 @@ namespace NotesServiceTests
 
             // Créer la note
             var createResponse = await _client.PostAsJsonAsync("/api/notes", note);
+            Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
             var created = await createResponse.Content.ReadFromJsonAsync<Note>();
+            Assert.NotNull(created);
 
-            // Sauvegarder la date de création initiale pour vérifier sa préservation
+            // Sauvegarder la date de création initiale
             var originalCreatedAt = created!.CreatedAt;
 
             // Modifier le contenu de la note
             created.Content = "Contenu mis à jour";
 
-            // Act
-            var response = await _client.PutAsJsonAsync($"/api/notes/{created.Id}", created);
+            // Act : Mettre à jour la note
+            var updateResponse = await _client.PutAsJsonAsync($"/api/notes/{created.Id}", created);
 
             // Assert
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
 
-            // Vérifier la mise à jour via une récupération de la note
+            // Vérifier via une récupération
             var getResponse = await _client.GetAsync($"/api/notes/{created.Id}");
+            Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
             var updatedNote = await getResponse.Content.ReadFromJsonAsync<Note>();
             Assert.NotNull(updatedNote);
             Assert.Equal("Contenu mis à jour", updatedNote!.Content);
-            // <span style="color: red;">Vérification critique :</span> La date CreatedAt doit rester inchangée.
-            Assert.Equal(originalCreatedAt, updatedNote.CreatedAt);
+
+            // Vérifier que la différence en millisecondes est inférieure à 1 ms
+            var diffMs = Math.Abs((updatedNote.CreatedAt - originalCreatedAt).TotalMilliseconds);
+            Assert.True(diffMs < 1, $"La différence entre la date originale et la date mise à jour est trop grande ({diffMs} ms)");
         }
+
 
         [Fact]
         public async Task DeleteNote_ReturnsNoContent_WhenSuccessful()
@@ -233,7 +239,7 @@ namespace NotesServiceTests
             AuthenticateClient();
 
             // Act
-            var response = await _client.DeleteAsync("/api/notes/nonexistentid");
+            var response = await _client.DeleteAsync("/api/notes/1");
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);

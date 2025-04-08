@@ -1,15 +1,14 @@
-﻿extern alias notesAlias;  // correspond à l'alias défini pour NotesService
+﻿extern alias notesAlias;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using PatientService.Data;
 using MongoDbSettings = notesAlias::NotesService.Settings.MongoDbSettings;
+
 namespace NotesServiceTests
 {
-    public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+    public class CustomWebApplicationFactory : WebApplicationFactory<notesAlias.Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

@@ -85,16 +85,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-await SeedDataAsync(app);
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+await SeedMongoData.SeedNotesAsync(services);
 
 app.Run();
 public partial class Program
 {
 
-    public static async Task SeedDataAsync(WebApplication app)
-    {
-        using var scope = app.Services.CreateScope();
-        var services = scope.ServiceProvider;
-        await SeedMongoData.SeedNotesAsync(services);
-    }
 }

@@ -36,10 +36,10 @@ namespace MicroFrontend.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                var token = loginResponse.Token;
+                var token = loginResponse!.Token;
 
                 // Stocker le token dans la Session 
-                HttpContext.Session.SetString("Token", token);
+                HttpContext.Session.SetString("Token", token!);
 
                 // Redirection vers la page des patients
                 return RedirectToAction("Index", "Patients");

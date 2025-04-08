@@ -39,7 +39,7 @@ builder.Services.AddSingleton<NoteService>();
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
-var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+var key = Encoding.ASCII.GetBytes(jwtSettings!.SecretKey);
 
 // Configurer l'authentification JWT
 builder.Services.AddAuthentication(options =>
@@ -104,6 +104,7 @@ app.MapControllers();
 
 #region SeedData
 
+await Task.Delay(5000);
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 await SeedMongoData.SeedNotesAsync(services);

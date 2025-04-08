@@ -31,7 +31,7 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
-var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+var key = Encoding.ASCII.GetBytes(jwtSettings!.SecretKey);
 
 // Configurer l'authentification JWT
 builder.Services.AddAuthentication(options =>

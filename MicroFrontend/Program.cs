@@ -10,6 +10,10 @@ builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7090/api/");
 });
+builder.Services.AddHttpClient("NotesService", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7041/api/");
+});
 
 // Configuration de la session
 builder.Services.AddDistributedMemoryCache();

@@ -11,10 +11,13 @@ namespace MicroFrontend.Controllers
     public class PatientsController : Controller
     {
         private readonly HttpClient _httpClient;
+        private readonly HttpClient _notesServiceClient;
+
 
         public PatientsController(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("ApiClient");
+            _notesServiceClient = httpClientFactory.CreateClient("NotesService");
         }
 
         public async Task<IActionResult> Index()
@@ -25,7 +28,7 @@ namespace MicroFrontend.Controllers
             }
 
             // Appel à l'API pour récupérer la liste des patients
-            List<PatientViewModel> patients = await _httpClient.GetFromJsonAsync<List<PatientViewModel>>("patients");
+            List<PatientViewModel>? patients = await _httpClient.GetFromJsonAsync<List<PatientViewModel>>("patients");
 
             return View(patients);
         }
@@ -40,13 +43,27 @@ namespace MicroFrontend.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            // Appel à l'API ou récupération depuis la base de données
+
+            // Récupère le patient (API Patients)
             var patient = await _httpClient.GetFromJsonAsync<PatientViewModel>($"patients/{id}");
             if (patient == null)
             {
                 return NotFound();
             }
-            return View(patient);
+
+            // Récupère les notes du patient (API NotesService)
+            // L'API NotesService expose l'endpoint GET /api/notes/patient/{patientId}.
+            // Vu la configuration de HttpClient ("NotesService" avec BaseAddress https://localhost:7041/api/),
+            // nous appelons directement l'URL "notes/patient/{id}"
+            var notes = await _notesServiceClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
+
+            var viewModel = new PatientDetailViewModel
+            {
+                Patient = patient,
+                Notes = notes ?? new List<NoteViewModel>()
+            };
+
+            return View(viewModel);
         }
 
         // POST: Patients/Details
@@ -149,7 +166,8 @@ namespace MicroFrontend.Controllers
             // Ajouter le token dans le header Authorization
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
+            _notesServiceClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             return true;
         }
 

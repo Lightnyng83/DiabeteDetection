@@ -2,7 +2,7 @@
 using PatientService.Data;
 using PatientService.Models;
 
-namespace PatientService.Repository
+namespace Utilitaires.Repository
 {
     public class PatientRepository : IPatientRepository
     {

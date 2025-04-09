@@ -16,10 +16,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PatientService\PatientService.csproj" />
+    <ProjectReference Include="..\Utilitaires\Utilitaires.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>config/NotesService/appsettings.json</TargetPath>
+		</None>
+		<None Update="appsettings.Development.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>config/NotesService/appsettings.Development.json</TargetPath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
+
+
+
+	<ItemGroup>
     <Compile Update="Program.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

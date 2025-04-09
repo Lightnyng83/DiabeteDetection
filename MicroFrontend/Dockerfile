@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["MicroFrontend.csproj", "MicroFrontend/"]
+COPY ["MicroFrontend/MicroFrontend.csproj", "MicroFrontend/"]
 RUN dotnet restore "./MicroFrontend/MicroFrontend.csproj"
 COPY . .
 WORKDIR "/src/MicroFrontend"

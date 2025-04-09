@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotesService", "NotesServic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotesServiceTests", "NotesServiceTests\NotesServiceTests.csproj", "{3A03E42F-02AA-4635-B60A-7C52BCB719D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilitaires", "Utilitaires\Utilitaires.csproj", "{E606543D-62CA-4058-9467-B60090624851}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{3A03E42F-02AA-4635-B60A-7C52BCB719D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A03E42F-02AA-4635-B60A-7C52BCB719D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A03E42F-02AA-4635-B60A-7C52BCB719D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E606543D-62CA-4058-9467-B60090624851}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E606543D-62CA-4058-9467-B60090624851}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E606543D-62CA-4058-9467-B60090624851}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E606543D-62CA-4058-9467-B60090624851}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

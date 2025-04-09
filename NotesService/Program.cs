@@ -1,16 +1,16 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using NotesService.Seed;
 using NotesService.Services;
 using NotesService.Settings;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson;
 using NotesService.Security;
-using PatientService.Repository;
 using Microsoft.EntityFrameworkCore;
+using NotesService.Data;
 using PatientService.Data;
+using Utilitaires.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 

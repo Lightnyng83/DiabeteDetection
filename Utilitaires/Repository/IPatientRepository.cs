@@ -1,6 +1,6 @@
 ﻿using PatientService.Models;
 
-namespace PatientService.Repository
+namespace Utilitaires.Repository
 {
     public interface IPatientRepository
     {

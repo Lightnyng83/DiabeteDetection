@@ -94,7 +94,7 @@ namespace MicroFrontend.Controllers
             var responsePatient = await _httpClient.PutAsJsonAsync($"patients/{patient.Id}", patient);
 
             // On initialise la variable pour la réponse de l'appel aux notes
-            HttpResponseMessage responseNote = null;
+            HttpResponseMessage responseNote = null!;
 
             // Vérifier si le médecin a ajouté du contenu pour une note
             if (!string.IsNullOrWhiteSpace(model.Content))
@@ -112,7 +112,7 @@ namespace MicroFrontend.Controllers
 
             // Si l'appel à l'API patient a réussi et que, soit l'appel aux notes n'a pas été effectué
             // (car aucun contenu n'a été fourni), soit il a réussi, alors redirige
-            if (responsePatient.IsSuccessStatusCode && (responseNote == null || responseNote.IsSuccessStatusCode))
+            if (responsePatient.IsSuccessStatusCode && (responseNote == null! || responseNote.IsSuccessStatusCode))
             {
                 return RedirectToAction("Index");
             }

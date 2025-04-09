@@ -1,12 +1,12 @@
-version: '3.4'
-
 networks:
   diabete-net:
     driver: bridge
 
 services:
   patientservice:
-    build: ./PatientService
+    build:
+      context: .
+      dockerfile: PatientService/Dockerfile
     ports:
       - "5000:80"
     environment:
@@ -16,38 +16,44 @@ services:
 
   ocelotgateway:
     build:
-      context: ./OcelotGateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: OcelotGateway/Dockerfile
     ports:
       - "5001:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     networks:
       - diabete-net
+    depends_on:
+      - patientservice
+      - notesservice
 
   microfrontend:
-    build: ./MicroFrontend
+    build:
+      context: .
+      dockerfile: MicroFrontend/Dockerfile
     ports:
       - "5002:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      # Dans Docker, pour communiquer avec PatientService et NotesService via HTTPS,
-      # utilisez les noms de service et assurez-vous que ces services sont configurés en HTTPS.
-      - AccountApi__BaseUrl=https://patientservice:5000/api/
-      - NotesApi__BaseUrl=https://notesservice:5003/api/
+      - AccountApi__BaseUrl=http://patientservice:80/api/
+      - NotesApi__BaseUrl=http://notesservice:80/api/
     networks:
       - diabete-net
+    depends_on:
+      - patientservice
+      - notesservice
 
   notesservice:
-      build:
-        context: .
-        dockerfile: NotesService/Dockerfile
-      ports:
-        - "5003:80"
-      environment:
-        - ASPNETCORE_ENVIRONMENT=Development
-      networks:
-        - diabete-net
+    build:
+      context: .
+      dockerfile: NotesService/Dockerfile
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - diabete-net
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest

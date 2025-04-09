@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
-using PatientService.Repository;
 using MongoDbSettings = notesAlias::NotesService.Settings.MongoDbSettings;
 
 namespace NotesServiceTests

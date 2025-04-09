@@ -12,11 +12,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["PatientService.csproj", "PatientService/"]
+
+# Copier uniquement les fichiers .csproj nécessaires
+COPY ["PatientService/PatientService.csproj", "PatientService/"]
+COPY ["Utilitaires/Utilitaires.csproj", "Utilitaires/"]
 RUN dotnet restore "./PatientService/PatientService.csproj"
-COPY . .
-WORKDIR "/src/PatientService"
-RUN dotnet build "./PatientService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Copier uniquement les dossiers du projet nécessaires
+COPY ["PatientService/", "PatientService/"]
+COPY ["Utilitaires/", "Utilitaires/"]
 
 # Cette étape permet de publier le projet de service à copier dans la phase finale
 FROM build AS publish

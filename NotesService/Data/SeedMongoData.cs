@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using NotesService.Models;
+﻿using NotesService.Models;
 using NotesService.Services;
 using PatientService.Models;
-using PatientService.Repository;
+using Utilitaires.Repository;
 
-namespace NotesService.Seed
+namespace NotesService.Data
 {
     public static class SeedMongoData
     {

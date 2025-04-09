@@ -102,9 +102,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 #region SeedData
 
+await Task.Delay(1000);
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
     try
     {
         // Définir un mot de passe fort pour l'utilisateur de test
@@ -112,7 +114,6 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        // Gère l'exception en fonction de tes besoins (log, etc.)
         Console.WriteLine("Erreur lors du seed de données: " + ex.Message);
     }
 }

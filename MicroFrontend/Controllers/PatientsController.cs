@@ -18,6 +18,7 @@ namespace MicroFrontend.Controllers
         {
             _httpClient = httpClientFactory.CreateClient("ApiClient");
             _notesServiceClient = httpClientFactory.CreateClient("NotesService");
+            Console.WriteLine(_httpClient);
         }
 
         public async Task<IActionResult> Index()
@@ -52,19 +53,17 @@ namespace MicroFrontend.Controllers
             }
 
             // Récupère les notes du patient (API NotesService)
-            // L'API NotesService expose l'endpoint GET /api/notes/patient/{patientId}.
-            // Vu la configuration de HttpClient ("NotesService" avec BaseAddress https://localhost:7041/api/),
-            // nous appelons directement l'URL "notes/patient/{id}"
-            var notes = await _notesServiceClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
+            //var notes = await _notesServiceClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
 
             var viewModel = new PatientDetailViewModel
             {
                 Patient = patient,
-                Notes = notes ?? new List<NoteViewModel>()
+                //Notes = notes ?? new List<NoteViewModel>()
             };
 
             return View(viewModel);
         }
+
 
         // POST: Patients/Details
         [HttpPost]

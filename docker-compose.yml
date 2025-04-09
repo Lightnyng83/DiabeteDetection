@@ -1,3 +1,5 @@
+version: '3.9'  # M me si Docker te dit que "version" est obsol te, c'est OK pour la clart 
+
 networks:
   diabete-net:
     driver: bridge
@@ -8,9 +10,41 @@ services:
       context: .
       dockerfile: PatientService/Dockerfile
     ports:
-      - "5000:80"
+      - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - sqlserver
+    networks:
+      - diabete-net
+
+  notesservice:
+    build:
+      context: .
+      dockerfile: NotesService/Dockerfile
+    ports:
+      - "5003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - sqlserver
+      - mongodb
+    networks:
+      - diabete-net
+
+  microfrontend:
+    build:
+      context: .
+      dockerfile: MicroFrontend/Dockerfile
+    ports:
+      - "5002:8080"
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development  
+    - AccountApi__BaseUrl=http://patientservice:8080/api/ # patientservice dans le reseau docker
+    - NotesApi__BaseUrl=http://notesservice:8080/api/     # notesservice dans le reseau docker
+    depends_on:
+      - patientservice
+      - notesservice
     networks:
       - diabete-net
 
@@ -19,58 +53,42 @@ services:
       context: .
       dockerfile: OcelotGateway/Dockerfile
     ports:
-      - "5001:80"
+      - "5001:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    networks:
-      - diabete-net
     depends_on:
       - patientservice
       - notesservice
-
-  microfrontend:
-    build:
-      context: .
-      dockerfile: MicroFrontend/Dockerfile
-    ports:
-      - "5002:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
-      - AccountApi__BaseUrl=http://patientservice:80/api/
-      - NotesApi__BaseUrl=http://notesservice:80/api/
-    networks:
-      - diabete-net
-    depends_on:
-      - patientservice
-      - notesservice
-
-  notesservice:
-    build:
-      context: .
-      dockerfile: NotesService/Dockerfile
-    ports:
-      - "5003:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
     networks:
       - diabete-net
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
     environment:
       SA_PASSWORD: "CnUJ3ge0JAnwUH!A6ZP@r3&ERaW#8z^w"
       ACCEPT_EULA: "Y"
+      MSSQL_TLS_VERSION: "1.2"  #  Force TLS 1.2 pour  viter les erreurs handshake
     ports:
       - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+      - ./init-sql:/docker-entrypoint-initdb.d  #  Script de cr ation de ta base automatique
     networks:
       - diabete-net
 
   mongodb:
-    image: mongo:latest
+    image: mongo
+    container_name: mongodb
+    restart: always
     ports:
       - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin123
+    command: ["mongod", "--bind_ip_all"]
+    volumes:
+      - mongodb_data_container:/data/db
     networks:
       - diabete-net
+
+volumes:
+  sqlserverdata:
+  mongodb_data_container:

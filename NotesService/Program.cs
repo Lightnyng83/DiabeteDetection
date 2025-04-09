@@ -104,10 +104,21 @@ app.MapControllers();
 
 #region SeedData
 
-await Task.Delay(5000);
-using var scope = app.Services.CreateScope();
-var services = scope.ServiceProvider;
-await SeedMongoData.SeedNotesAsync(services);
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        // Assurez-vous que SeedData est bien initialisé
+        await SeedMongoData.SeedNotesAsync(services);
+    }
+    catch (Exception ex)
+    {
+        // Gestion d'erreur
+        Console.WriteLine("Erreur lors du seed de données: " + ex.Message);
+    }
+}
 
 #endregion
 

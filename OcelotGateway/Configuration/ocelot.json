@@ -6,7 +6,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "patientservice",
-          "Port": 80
+          "Port": 8080
         }
       ],
       "UpstreamPathTemplate": "/patients/{everything}",
@@ -19,7 +19,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "notesservice",
-          "Port": 80
+          "Port": 8080
         }
       ],
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]

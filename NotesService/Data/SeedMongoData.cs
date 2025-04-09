@@ -1,4 +1,5 @@
-﻿using NotesService.Models;
+﻿using MongoDB.Driver;
+using NotesService.Models;
 using NotesService.Services;
 using PatientService.Models;
 using Utilitaires.Repository;
@@ -20,15 +21,27 @@ namespace NotesService.Data
 
             // Récupérer la liste des patients
             List<Patient> patients = await patientRepository.GetAllPatientsAsync();
-            if (patients == null || patients.Count == 0)
+            if (patients == null! || patients.Count == 0)
             {
                 // Vous pouvez choisir de logger l'absence de patients ou d'injecter des patients fictifs dans ce cas
                 Console.WriteLine("Aucun patient trouvé dans la base SQL. Le seed des notes ne sera pas effectué.");
                 return;
             }
+            var mongoClient = new MongoClient("mongodb://mongodb:27017"); // Remplacer par ta chaîne de connexion Mongo
+            var database = mongoClient.GetDatabase("DiabeteNotesDb");
 
+            // Vérifie si la collection "Notes" existe déjà
+            var collectionNames = await database.ListCollectionNamesAsync();
+            var collections = await collectionNames.ToListAsync();
+
+            if (!collections.Contains("Notes"))
+            {
+                // Si la collection n'existe pas, on la crée manuellement
+                await database.CreateCollectionAsync("Notes");
+                Console.WriteLine("Collection 'Notes' créée.");
+            }
             var patientNote = noteService.GetNoteAsync(patients[0].Id.ToString());
-            if (patientNote == null)
+            if (patientNote == null!)
             {
                 foreach (var patient in patients)
                 {
@@ -106,6 +119,8 @@ namespace NotesService.Data
                             break;
                     }
                 }
+
+                Console.WriteLine("SeedData Correctement initialisé");
             
             }
         }

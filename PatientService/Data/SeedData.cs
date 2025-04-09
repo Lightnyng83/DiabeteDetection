@@ -14,6 +14,9 @@ namespace PatientService.Data
             // Créer un scope pour obtenir les services
             using (var scope = serviceProvider.CreateScope())
             {
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                context.Database.EnsureCreated();
+                context.Database.Migrate();
                 #region Create User
 
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();

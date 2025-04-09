@@ -1,4 +1,3 @@
-version: '3.4'
 services:
   patientservice:
     build: ./PatientService
@@ -6,7 +5,8 @@ services:
       - "5000:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-  
+    volumes:
+      - ./keys:/app/keys
 
   ocelotgateway:
     build: ./OcelotGateway
@@ -20,16 +20,21 @@ services:
     ports:
       - "5002:80"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - AccountApi__BaseUrl=https://accountservice/api/
-      - NotesApi__BaseUrl=https://notesservice/api/
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - AccountApi__BaseUrl=http://patientservice/api/
+      - NotesApi__BaseUrl=http://notesservice/api/
+    volumes:
+      - ./keys:/app/keys
+    depends_on:
+      - patientservice
+      - notesservice
 
   notesservice:
     build: ./NotesService
     ports:
-    - "5003:80"
+      - "5003:80"
     environment:
-    - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Development
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -39,12 +44,10 @@ services:
     ports:
       - "1433:1433"
 
-      # MongoDB service
   mongodb:
     image: mongo:latest
     ports:
       - "27017:27017"
     environment:
-      # Ces variables sont optionnelles, à configurer si besoin
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin123

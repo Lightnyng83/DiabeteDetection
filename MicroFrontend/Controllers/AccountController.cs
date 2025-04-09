@@ -13,6 +13,7 @@ namespace MicroFrontend.Controllers
         public AccountController(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("ApiClient");
+            Console.WriteLine($"[DEBUG] BaseAddress: {_httpClient.BaseAddress}");
         }
 
         // GET: /Account/Login
@@ -32,6 +33,9 @@ namespace MicroFrontend.Controllers
             }
 
             // Appel à l'API de connexion
+            Console.WriteLine($"[DEBUG] BaseAddress : {_httpClient.BaseAddress}");
+            Console.WriteLine($"[DEBUG] Appel de l'API: {_httpClient.BaseAddress}account/login");
+
             var response = await _httpClient.PostAsJsonAsync("account/login", model);
             if (response.IsSuccessStatusCode)
             {

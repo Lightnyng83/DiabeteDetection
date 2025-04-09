@@ -7,6 +7,7 @@ using PatientService.Data;
 using PatientService.Models;
 using PatientService.Security;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using PatientService.Repository; // Assure-toi d'avoir ce using
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,14 +84,16 @@ builder.Services.AddCors(options =>
         });
 });
 
-
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("keys"))
+    .SetApplicationName("DiabeteDetection");
 #endregion
 
 builder.Services.AddRouting();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-
+app.UseHttpsRedirection();
 app.UseRouting(); // D'abord le routage
 app.UseCors("AllowFront"); // Puis CORS si nécessaire
 app.UseAuthentication(); // Puis l'authentification

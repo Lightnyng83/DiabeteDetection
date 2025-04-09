@@ -1,26 +1,37 @@
 ﻿using MongoDB.Driver;
 using NotesService.Models;
 using NotesService.Services;
-using PatientService.Models;
-using Utilitaires.Repository;
+using System.Net.Http;
+
 
 namespace NotesService.Data
 {
-    public static class SeedMongoData
+    public class SeedMongoData
     {
-        public static async Task SeedNotesAsync(IServiceProvider services)
+        private readonly HttpClient _httpClient;
+        private readonly HttpClient _notesServiceClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public SeedMongoData(HttpClient httpClient, HttpClient notesServiceClient, IHttpContextAccessor httpContextAccessor)
+        {
+            _httpClient = httpClient;
+            _notesServiceClient = notesServiceClient;
+            this._httpContextAccessor = httpContextAccessor;
+        }
+        public async Task SeedNotesAsync(IServiceProvider services)
         {
             var noteService = services.GetRequiredService<NoteService>();
 
-            var patientRepository = services.GetService<IPatientRepository>();
-            if (patientRepository == null)
+            var patientApiService = services.GetRequiredService<PatientApiService>();
+
+            var httpClient = services.GetRequiredService<HttpClient>();
+            if (!TryAddTokenToHeader())
             {
-                // Si vous ne pouvez pas récupérer le repository, vous pouvez lever une exception ou passer un fallback.
-                throw new Exception("PatientRepository non disponible pour le seed.");
+                Console.WriteLine("Token non valide ou absent. Impossible d'ajouter le token dans l'en-tête.");
+                return;
             }
 
-            // Récupérer la liste des patients
-            List<Patient> patients = await patientRepository.GetAllPatientsAsync();
+            List<PatientDto> patients = await patientApiService.GetAllPatientsAsync();
+
             if (patients == null! || patients.Count == 0)
             {
                 // Vous pouvez choisir de logger l'absence de patients ou d'injecter des patients fictifs dans ce cas
@@ -120,9 +131,31 @@ namespace NotesService.Data
                     }
                 }
 
-                Console.WriteLine("SeedData Correctement initialisé");
+                Console.WriteLine("[DEBUG]SeedData Correctement initialisé");
             
             }
+        }
+
+
+        
+
+        private bool TryAddTokenToHeader()
+        {
+            // Récupérer le token depuis la Session
+            var token = _httpContextAccessor.HttpContext.Session.GetString("Token");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                // Rediriger vers la page de connexion si aucun token n'est disponible
+                return false;
+            }
+
+            // Ajouter le token dans le header Authorization
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _notesServiceClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            return true;
         }
     }
 }

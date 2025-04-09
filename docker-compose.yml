@@ -1,4 +1,4 @@
-version: '3.9'  # M me si Docker te dit que "version" est obsol te, c'est OK pour la clart 
+version: '3.9'
 
 networks:
   diabete-net:
@@ -14,9 +14,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_healthy
     networks:
       - diabete-net
+    volumes:
+      - ./Configuration:/app/Configuration
 
   notesservice:
     build:
@@ -27,10 +30,16 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - sqlserver
-      - mongodb
+      patientservice:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
     networks:
       - diabete-net
+    volumes:
+      - ./Configuration:/app/Configuration
 
   microfrontend:
     build:
@@ -39,9 +48,9 @@ services:
     ports:
       - "5002:8080"
     environment:
-    - ASPNETCORE_ENVIRONMENT=Development  
-    - AccountApi__BaseUrl=http://patientservice:8080/api/ # patientservice dans le reseau docker
-    - NotesApi__BaseUrl=http://notesservice:8080/api/     # notesservice dans le reseau docker
+      - ASPNETCORE_ENVIRONMENT=Development
+      - AccountApi__BaseUrl=http://patientservice:8080/api/
+      - NotesApi__BaseUrl=http://notesservice:8080/api/
     depends_on:
       - patientservice
       - notesservice
@@ -68,12 +77,16 @@ services:
     environment:
       SA_PASSWORD: "CnUJ3ge0JAnwUH!A6ZP@r3&ERaW#8z^w"
       ACCEPT_EULA: "Y"
-      MSSQL_TLS_VERSION: "1.2"  #  Force TLS 1.2 pour  viter les erreurs handshake
+      MSSQL_TLS_VERSION: "1.2"
     ports:
       - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/1433"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - sqlserverdata:/var/opt/mssql
-      - ./init-sql:/docker-entrypoint-initdb.d  #  Script de cr ation de ta base automatique
     networks:
       - diabete-net
 

@@ -7,10 +7,8 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson;
 using NotesService.Security;
-using Microsoft.EntityFrameworkCore;
 using NotesService.Data;
-using PatientService.Data;
-using Utilitaires.Repository;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,17 +17,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
-//Obligé d'ajouter le context de PatientService pour pouvoir faire le seed
-//car IPatientRepository est injecté dans le service NoteService
-//et nécessite le context SQL
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); // ou une autre chaîne pour SQL
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
 
 #endregion
-// Charger la config Mongo
+builder.Services.AddHttpClient<PatientApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://patientservice:8080"); // <== l'url dockerisé de PatientService
+});
 
-builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<NoteService>();
@@ -110,12 +104,11 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        // Assurez-vous que SeedData est bien initialisé
-        await SeedMongoData.SeedNotesAsync(services);
+        var seedMongoData = services.GetRequiredService<SeedMongoData>(); 
+        await seedMongoData.SeedNotesAsync(services); 
     }
     catch (Exception ex)
     {
-        // Gestion d'erreur
         Console.WriteLine("Erreur lors du seed de données: " + ex.Message);
     }
 }

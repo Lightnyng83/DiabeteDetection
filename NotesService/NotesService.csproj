@@ -1,41 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>b95e4f49-030f-43eb-8d85-176b3165a376</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>b95e4f49-030f-43eb-8d85-176b3165a376</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Utilitaires\Utilitaires.csproj" />
-  </ItemGroup>
 	<ItemGroup>
-		<None Update="appsettings.json">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+		<PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="..\Configuration\appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>config/NotesService/appsettings.json</TargetPath>
+			<Link>appsettings.json</Link>
 		</None>
-		<None Update="appsettings.Development.json">
+		<None Update="..\Configuration\appsettings.Development.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>config/NotesService/appsettings.Development.json</TargetPath>
+			<Link>appsettings.Development.json</Link>
 		</None>
 	</ItemGroup>
 
 
-
-
-	<ItemGroup>
-    <Compile Update="Program.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-  </ItemGroup>
 
 </Project>

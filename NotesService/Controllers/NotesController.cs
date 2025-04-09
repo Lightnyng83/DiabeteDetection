@@ -13,6 +13,7 @@ namespace NotesService.Controllers
         public IActionResult Get() => Ok("Healthy");
     }
 
+
     [ApiController]
     [Route("api/[controller]")]
     [Authorize] 

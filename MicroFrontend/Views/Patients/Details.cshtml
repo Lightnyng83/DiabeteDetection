@@ -73,7 +73,8 @@ else
         @foreach (var note in Model.Notes)
         {
             <li>
-                <strong>@note.CreatedAt.ToLocalTime()</strong> – @note.Content
+                <strong>@note.CreatedAt.ToLocalTime()</strong> – <pre>@note.Content</pre>
+
             </li>
         }
     </ul>

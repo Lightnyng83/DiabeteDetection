@@ -35,7 +35,12 @@ namespace NotesService.Controllers
             return Ok(notes);
         }
 
-
+        [HttpGet("patient")]
+        public async Task<IActionResult> GetNotes()
+        {
+            var notes = await _noteService.GetNotesAsync();
+            return Ok(notes);
+        }
 
         // POST /api/notes
         [HttpPost]

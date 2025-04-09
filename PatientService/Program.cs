@@ -9,8 +9,13 @@ using PatientService.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 
-var builder = WebApplication.CreateBuilder(args);
-
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    WebRootPath = "wwwroot",
+    ApplicationName = typeof(Program).Assembly.FullName,
+});
+builder.WebHost.UseUrls("http://*:8080");
 // Utilise builder.Configuration directement
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -110,37 +115,20 @@ app.MapControllerRoute(
 
 using (var scope = app.Services.CreateScope())
 {
+    var services = scope.ServiceProvider;
     try
     {
-        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<ApplicationDbContext>();
 
-        // Valide si ton ApplicationDbContext est disponible
-        var context = services.GetService<ApplicationDbContext>();
-
-        if (context == null)
+        // Nouvelle version propre
+        if (context.Database.GetPendingMigrations().Any())
         {
-            Console.WriteLine("ApplicationDbContext est NULL. Vérifier la configuration !");
-            throw new Exception("ApplicationDbContext non disponible");
+            Console.WriteLine("[INFO] Migrations en attente... Application des migrations.");
+            context.Database.Migrate();
         }
-
-        var retryCount = 10;
-        var delay = TimeSpan.FromSeconds(5);
-
-        for (int i = 0; i < retryCount; i++)
+        else
         {
-            try
-            {
-                if (context.Database.CanConnect())
-                {
-                    Console.WriteLine("Connexion SQL Server établie.");
-                    break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Tentative {i + 1} : SQL Server pas prêt ({ex.Message})");
-                await Task.Delay(delay);
-            }
+            Console.WriteLine("[INFO] Pas de migration en attente.");
         }
 
         await SeedData.InitializeAsync(services, "Test@12345");
@@ -150,6 +138,7 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Erreur lors du seed de données: " + ex.Message);
     }
 }
+
 #endregion
 
 

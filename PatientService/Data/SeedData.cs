@@ -22,7 +22,6 @@ namespace PatientService.Data
                     try
                     {
                         Console.WriteLine("Tentative de connexion à SQL Server...");
-                        await context.Database.MigrateAsync();
                         Console.WriteLine("Connexion réussie à SQL Server.");
                         break; // Succès
                     }

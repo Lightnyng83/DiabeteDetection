@@ -27,6 +27,8 @@ builder.Services.AddHttpClient<PatientApiService>(client =>
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton<NoteService>();
+builder.Services.AddTransient<SeedMongoData>();
+builder.Services.AddHttpContextAccessor();
 #region JWT Bearer
 
 // Charger la configuration JWT
@@ -43,7 +45,7 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = true;
+        options.RequireHttpsMetadata = false;
         options.SaveToken = true;
         options.Events = new JwtBearerEvents
         {
@@ -104,8 +106,9 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        var seedMongoData = services.GetRequiredService<SeedMongoData>(); 
-        await seedMongoData.SeedNotesAsync(services); 
+        var seedMongoData = services.GetRequiredService<SeedMongoData>();
+        await seedMongoData.SeedNotesAsync(services);
+
     }
     catch (Exception ex)
     {

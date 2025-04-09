@@ -53,12 +53,12 @@ namespace MicroFrontend.Controllers
             }
 
             // Récupère les notes du patient (API NotesService)
-            //var notes = await _notesServiceClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
+            var notes = await _notesServiceClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
 
             var viewModel = new PatientDetailViewModel
             {
                 Patient = patient,
-                //Notes = notes ?? new List<NoteViewModel>()
+                Notes = notes ?? new List<NoteViewModel>()
             };
 
             return View(viewModel);

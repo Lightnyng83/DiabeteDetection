@@ -20,6 +20,12 @@ namespace NotesService.Services
         public async Task<List<Note>> GetNotesByPatientIdAsync(Guid patientId)
             => await _notesCollection.Find(n => n.PatientId == patientId).ToListAsync();
 
+        public async Task<List<Note>> GetNotesAsync()
+        {
+            return await _notesCollection.Find(_ => true).ToListAsync();
+        }
+
+
         public async Task<Note> CreateNoteAsync(Note note)
         {
             note.CreatedAt = DateTime.UtcNow;

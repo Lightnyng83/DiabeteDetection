@@ -1,21 +1,24 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using NotesService.Models;
 using NotesService.Services;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 
 
 namespace NotesService.Data
 {
     public class SeedMongoData
     {
-        private readonly HttpClient _httpClient;
-        private readonly HttpClient _notesServiceClient;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public SeedMongoData(HttpClient httpClient, HttpClient notesServiceClient, IHttpContextAccessor httpContextAccessor)
+        private readonly HttpClient _client;
+
+        public SeedMongoData(HttpClient httpClient)
         {
-            _httpClient = httpClient;
-            _notesServiceClient = notesServiceClient;
-            this._httpContextAccessor = httpContextAccessor;
+            _client = httpClient;
+           
         }
         public async Task SeedNotesAsync(IServiceProvider services)
         {
@@ -23,14 +26,8 @@ namespace NotesService.Data
 
             var patientApiService = services.GetRequiredService<PatientApiService>();
 
-            var httpClient = services.GetRequiredService<HttpClient>();
-            if (!TryAddTokenToHeader())
-            {
-                Console.WriteLine("Token non valide ou absent. Impossible d'ajouter le token dans l'en-tête.");
-                return;
-            }
 
-            List<PatientDto> patients = await patientApiService.GetAllPatientsAsync();
+            List<PatientDto> patients = await patientApiService.GetAllPatientsAsync(services);
 
             if (patients == null! || patients.Count == 0)
             {
@@ -51,7 +48,7 @@ namespace NotesService.Data
                 await database.CreateCollectionAsync("Notes");
                 Console.WriteLine("Collection 'Notes' créée.");
             }
-            var patientNote = noteService.GetNoteAsync(patients[0].Id.ToString());
+            var patientNote = await noteService.GetNoteAsync(patients[0].Id.ToString());
             if (patientNote == null!)
             {
                 foreach (var patient in patients)
@@ -134,28 +131,6 @@ namespace NotesService.Data
                 Console.WriteLine("[DEBUG]SeedData Correctement initialisé");
             
             }
-        }
-
-
-        
-
-        private bool TryAddTokenToHeader()
-        {
-            // Récupérer le token depuis la Session
-            var token = _httpContextAccessor.HttpContext.Session.GetString("Token");
-
-            if (string.IsNullOrEmpty(token))
-            {
-                // Rediriger vers la page de connexion si aucun token n'est disponible
-                return false;
-            }
-
-            // Ajouter le token dans le header Authorization
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            _notesServiceClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            return true;
         }
     }
 }

@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["OcelotGateway/OcelotGateway.csproj", "OcelotGateway/"]
+COPY ["OcelotGateway.csproj", "OcelotGateway/"]
 RUN dotnet restore "./OcelotGateway/OcelotGateway.csproj"
 COPY . .
 WORKDIR "/src/OcelotGateway"

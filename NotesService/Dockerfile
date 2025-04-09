@@ -1,30 +1,34 @@
-# Consultez https://aka.ms/customizecontainer pour savoir comment personnaliser votre conteneur de débogage et comment Visual Studio utilise ce Dockerfile pour générer vos images afin d’accélérer le débogage.
-
-# Cet index est utilisé lors de l’exécution à partir de VS en mode rapide (par défaut pour la configuration de débogage)
+# Phase de base (runtime)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
-# Cette phase est utilisée pour générer le projet de service
+# Phase de build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copier les fichiers csproj pour NotesService et PatientService
 COPY ["NotesService/NotesService.csproj", "NotesService/"]
 COPY ["PatientService/PatientService.csproj", "PatientService/"]
-RUN dotnet restore "./NotesService/NotesService.csproj"
-COPY . .
-WORKDIR "/src/NotesService"
-RUN dotnet build "./NotesService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Cette étape permet de publier le projet de service à copier dans la phase finale
+# Restaurer les dépendances de NotesService (qui inclut la référence à PatientService)
+RUN dotnet restore "NotesService/NotesService.csproj"
+
+# Copier l'intégralité de la solution
+COPY . .
+
+# Construire NotesService
+WORKDIR "/src/NotesService"
+RUN dotnet build "NotesService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Phase de publication
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./NotesService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "NotesService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# Cette phase est utilisée en production ou lors de l’exécution à partir de VS en mode normal (par défaut quand la configuration de débogage n’est pas utilisée)
+# Phase finale
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .

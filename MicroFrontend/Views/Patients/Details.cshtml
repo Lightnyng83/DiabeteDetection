@@ -48,17 +48,27 @@
         <input asp-for="Patient.Telephone" class="form-control" />
         <span asp-validation-for="Patient.Telephone" class="text-danger"></span>
     </div>
+    
+    <div class="form-group">
+        <label asp-for="Notes" class="control-label"></label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
 
     <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
     <a asp-action="Index" class="btn btn-secondary">Annuler</a>
 </form>
+
 <h3>Notes du Patient</h3>
 @if (Model.Notes == null || !Model.Notes.Any())
 {
     <p>Aucune note trouvée pour ce patient.</p>
+
 }
 else
 {
+
     <ul>
         @foreach (var note in Model.Notes)
         {

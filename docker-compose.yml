@@ -6,7 +6,6 @@ services:
       - "5000:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-
   
 
   ocelotgateway:
@@ -22,6 +21,8 @@ services:
       - "5002:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - AccountApi__BaseUrl=https://accountservice/api/
+      - NotesApi__BaseUrl=https://notesservice/api/
 
   notesservice:
     build: ./NotesService

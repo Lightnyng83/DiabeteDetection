@@ -68,7 +68,7 @@ namespace MicroFrontend.Controllers
 
         // POST: Patients/Details
         [HttpPost]
-        public async Task<IActionResult> Details(PatientViewModel model)
+        public async Task<IActionResult> Details(PatientDetailViewModel model)
         {
             if (!TryAddTokenToHeader())
             {
@@ -79,16 +79,47 @@ namespace MicroFrontend.Controllers
                 return View(model);
             }
 
-            // Envoi d'une requête PUT à l'API pour mettre à jour le patient
-            var response = await _httpClient.PutAsJsonAsync($"patients/{model.Id}", model);
-            if (response.IsSuccessStatusCode)
+            // Mettre à jour le patient
+            var patient = new PatientViewModel
             {
-                // Redirige vers l'index ou affiche un message de succès
+                Nom = model.Patient.Nom,
+                Prenom = model.Patient.Prenom,
+                DateNaissance = model.Patient.DateNaissance,
+                Genre = model.Patient.Genre,
+                Adresse = model.Patient.Adresse,
+                Telephone = model.Patient.Telephone,
+                Id = model.Patient.Id
+            };
+
+            var responsePatient = await _httpClient.PutAsJsonAsync($"patients/{patient.Id}", patient);
+
+            // On initialise la variable pour la réponse de l'appel aux notes
+            HttpResponseMessage responseNote = null;
+
+            // Vérifier si le médecin a ajouté du contenu pour une note
+            if (!string.IsNullOrWhiteSpace(model.Content))
+            {
+                var note = new NoteViewModel
+                {
+                    PatientId = model.Patient.Id,
+                    Content = model.Content,
+                    CreatedAt = DateTime.Now
+                };
+
+                // Appeler l'API notes uniquement si du contenu a été fourni
+                responseNote = await _notesServiceClient.PostAsJsonAsync("notes", note);
+            }
+
+            // Si l'appel à l'API patient a réussi et que, soit l'appel aux notes n'a pas été effectué
+            // (car aucun contenu n'a été fourni), soit il a réussi, alors redirige
+            if (responsePatient.IsSuccessStatusCode && (responseNote == null || responseNote.IsSuccessStatusCode))
+            {
                 return RedirectToAction("Index");
             }
-            // En cas d'erreur, on réaffiche le formulaire avec un message d'erreur (à compléter selon vos besoins)
-            ModelState.AddModelError(string.Empty, "Erreur lors de la mise à jour du patient.");
+
+            ModelState.AddModelError(string.Empty, "Erreur lors de la mise à jour du patient ou de l'ajout de la note.");
             return View(model);
+
         }
 
 

@@ -8,11 +8,13 @@ builder.Services.AddControllersWithViews();
 // Configure HttpClient
 builder.Services.AddHttpClient("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7090/api/");
+    var baseUrl = builder.Configuration["AccountApi:BaseUrl"];
+    client.BaseAddress = new Uri(baseUrl);
 });
 builder.Services.AddHttpClient("NotesService", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7041/api/");
+    var baseUrl = builder.Configuration["NotesApi:BaseUrl"];
+    client.BaseAddress = new Uri(baseUrl);
 });
 
 // Configuration de la session

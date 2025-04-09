@@ -10,9 +10,9 @@ namespace MicroFrontend.Controllers
     {
         private readonly HttpClient _httpClient;
 
-        public AccountController(HttpClient httpClient)
+        public AccountController(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient("ApiClient");
         }
 
         // GET: /Account/Login
@@ -32,7 +32,7 @@ namespace MicroFrontend.Controllers
             }
 
             // Appel à l'API de connexion
-            var response = await _httpClient.PostAsJsonAsync("https://localhost:7090/api/account/login", model);
+            var response = await _httpClient.PostAsJsonAsync("account/login", model);
             if (response.IsSuccessStatusCode)
             {
                 var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();

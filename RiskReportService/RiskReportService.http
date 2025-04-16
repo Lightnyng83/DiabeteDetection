@@ -1,0 +1,6 @@
+@RiskReportService_HostAddress = http://localhost:5274
+
+GET {{RiskReportService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

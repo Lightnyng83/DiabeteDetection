@@ -56,6 +56,9 @@ namespace MicroFrontend.Controllers
             // Récupère les notes du patient (API NotesService)
             var notes = await _notesServiceClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
 
+
+            // Récupère le iveau de risque du patient (API RiskService)
+
             var risk = await _httpRiskClient.GetFromJsonAsync<RiskLevel>($"risk/{id}");
 
             var viewModel = new PatientDetailViewModel

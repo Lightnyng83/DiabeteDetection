@@ -9,7 +9,7 @@ namespace NotesService.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        [BsonRepresentation(BsonType.String)] // Forcer la représentation en chaîne pour le Guid
+        [BsonRepresentation(BsonType.String)] // Force la représentation en chaîne pour le Guid
         public Guid PatientId { get; set; }
 
         public string Content { get; set; } = null!;

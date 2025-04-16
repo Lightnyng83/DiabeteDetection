@@ -16,7 +16,6 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ApplicationName = typeof(Program).Assembly.FullName,
 });
 builder.WebHost.UseUrls("http://*:8080");
-// Utilise builder.Configuration directement
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (!Program.IsIntegrationTest) // Si on est pas en test => donc en prod

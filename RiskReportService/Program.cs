@@ -14,11 +14,11 @@ builder.Services.AddEndpointsApiExplorer();
 // Configurer les HttpClients
 builder.Services.AddHttpClient<IPatientClient, PatientClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:PatientApi"]);
+    client.BaseAddress = new Uri(builder.Configuration["Services:PatientApi"]!);
 });
 builder.Services.AddHttpClient<INoteClient, NoteClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:NotesApi"]);
+    client.BaseAddress = new Uri(builder.Configuration["Services:NotesApi"]!);
 });
 
 // Injection du service métier

@@ -12,7 +12,6 @@ namespace RiskReportService.Services
 {
     public class RiskAssessmentService : IRiskAssessmentService
     {
-        private readonly HttpClient _httpClient;
         private readonly IPatientClient _patientClient;
         private readonly INoteClient _noteClient;
 

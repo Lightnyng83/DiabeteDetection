@@ -32,7 +32,7 @@ namespace NotesService.Services
             var audience = configuration["JwtSettings:Audience"];
             var expiryMinutes = 60;
 
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var tokenDescriptor = new SecurityTokenDescriptor

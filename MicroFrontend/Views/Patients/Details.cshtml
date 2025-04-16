@@ -9,6 +9,8 @@
 <form asp-action="Details" method="post">
     <!-- Champ caché pour l'ID du patient -->
     <input type="hidden" asp-for="Patient.Id" />
+    
+    <p>Niveau de risque du patient : @Model.RiskLevel</p>
 
     <div class="form-group">
         <label asp-for="Patient.Nom" class="control-label"></label>

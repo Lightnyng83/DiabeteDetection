@@ -1,18 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RiskAssessmentService.Services;
-using RiskAssessmentService.Enums;
+using RiskReportService.Models;
+using RiskReportService.Services.Interfaces;
 
-namespace RiskAssessmentControllers
+namespace RiskReportService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RiskController : ControllerBase 
+    public class RiskController : ControllerBase
     {
         private readonly IRiskAssessmentService _riskService;
+        private readonly IServiceProvider _services;
 
-        public RiskController(IRiskAssessmentService riskService)
+        public RiskController(IRiskAssessmentService riskService, IServiceProvider services)
         {
             _riskService = riskService;
+            _services = services;
         }
 
         [HttpGet("{patientId}")]

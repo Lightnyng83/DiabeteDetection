@@ -31,25 +31,25 @@ namespace NotesService.Data
 
             if (patients == null! || patients.Count == 0)
             {
-                // Vous pouvez choisir de logger l'absence de patients ou d'injecter des patients fictifs dans ce cas
                 Console.WriteLine("Aucun patient trouvé dans la base SQL. Le seed des notes ne sera pas effectué.");
                 return;
             }
-            var mongoClient = new MongoClient("mongodb://mongodb:27017"); // Remplacer par ta chaîne de connexion Mongo
+            var mongoClient = new MongoClient("mongodb://mongodb:27017"); 
             var database = mongoClient.GetDatabase("DiabeteNotesDb");
 
             // Vérifie si la collection "Notes" existe déjà
             var collectionNames = await database.ListCollectionNamesAsync();
             var collections = await collectionNames.ToListAsync();
 
-            if (!collections.Contains("Notes"))
+            if (!collections.Contains("PatientNotes"))
             {
                 // Si la collection n'existe pas, on la crée manuellement
                 await database.CreateCollectionAsync("Notes");
                 Console.WriteLine("Collection 'Notes' créée.");
             }
-            var patientNote = await noteService.GetNoteAsync(patients[0].Id.ToString());
-            if (patientNote == null!)
+            var notesCollection = database.GetCollection<Note>("Notes");
+            var notesCount = await notesCollection.CountDocumentsAsync(FilterDefinition<Note>.Empty);
+            if (notesCount == 0)
             {
                 foreach (var patient in patients)
                 {
@@ -78,6 +78,8 @@ namespace NotesService.Data
                                 Content = "Le patient déclare avoir fait une réaction aux médicaments au cours des 3 derniers mois Il remarque également que son audition continue d'être anormale",
                                 CreatedAt = DateTime.UtcNow
                             };
+                            await noteService.CreateNoteAsync(note3);
+
                             break;
                         case "TestInDanger":
                             var note4 = new Note

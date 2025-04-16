@@ -28,6 +28,16 @@ builder.Services.AddHttpClient("NotesService", client =>
     client.BaseAddress = new Uri(baseUrl);
 });
 
+builder.Services.AddHttpClient("RiskService", client =>
+{
+    var baseUrl = builder.Configuration["RiskReportApi:BaseUrl"];
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        baseUrl = "https://localhost:7089/api/"; // Valeur par défaut en local
+    }
+    client.BaseAddress = new Uri(baseUrl);
+});
+
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("keys"))
     .SetApplicationName("DiabeteDetection");

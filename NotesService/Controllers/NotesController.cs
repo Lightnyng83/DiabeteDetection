@@ -7,15 +7,6 @@ namespace NotesService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class HealthController : ControllerBase
-    {
-        [HttpGet]
-        public IActionResult Get() => Ok("Healthy");
-    }
-
-
-    [ApiController]
-    [Route("api/[controller]")]
     [Authorize] 
     public class NotesController : ControllerBase
     {

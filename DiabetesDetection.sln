@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroFrontend", "MicroFront
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{DBC29898-7E12-4695-9211-220E0B9E7925}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		docker-compose.yml = docker-compose.yml
 		wait-for-it.sh = wait-for-it.sh
 	EndProjectSection
@@ -21,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotesService", "NotesServic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotesServiceTests", "NotesServiceTests\NotesServiceTests.csproj", "{3A03E42F-02AA-4635-B60A-7C52BCB719D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilitaires", "Utilitaires\Utilitaires.csproj", "{E606543D-62CA-4058-9467-B60090624851}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{6504E23C-9A10-41B7-8D15-E3D3752A518F}"
 	ProjectSection(SolutionItems) = preProject
 		NotesService\appsettings.Development.json = NotesService\appsettings.Development.json
@@ -30,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configurat
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiskReportService", "RiskReportService\RiskReportService.csproj", "{A4BAD85A-079A-4F6B-ABDE-ECDE96FFFAA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiskReportService.Tests", "RiskReportService.Tests\RiskReportService.Tests.csproj", "{2D84A4C9-35C2-4F06-AA76-240FD49EF63E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,14 +62,14 @@ Global
 		{3A03E42F-02AA-4635-B60A-7C52BCB719D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A03E42F-02AA-4635-B60A-7C52BCB719D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A03E42F-02AA-4635-B60A-7C52BCB719D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E606543D-62CA-4058-9467-B60090624851}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E606543D-62CA-4058-9467-B60090624851}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E606543D-62CA-4058-9467-B60090624851}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E606543D-62CA-4058-9467-B60090624851}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A4BAD85A-079A-4F6B-ABDE-ECDE96FFFAA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A4BAD85A-079A-4F6B-ABDE-ECDE96FFFAA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4BAD85A-079A-4F6B-ABDE-ECDE96FFFAA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4BAD85A-079A-4F6B-ABDE-ECDE96FFFAA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D84A4C9-35C2-4F06-AA76-240FD49EF63E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D84A4C9-35C2-4F06-AA76-240FD49EF63E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D84A4C9-35C2-4F06-AA76-240FD49EF63E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D84A4C9-35C2-4F06-AA76-240FD49EF63E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

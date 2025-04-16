@@ -141,6 +141,7 @@ using (var scope = app.Services.CreateScope())
 
 #endregion
 
+app.MapGet("/health", () => Results.Ok("Healthy"));
 
 
 app.Run();

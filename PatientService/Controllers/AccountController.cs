@@ -14,6 +14,21 @@ namespace PatientService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    public class HealthController : ControllerBase
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+        public HealthController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+        // GET: api/health
+        [HttpGet]
+        public IActionResult GetHealth() => Ok("Healthy");
+    }
+
+
+    [Route("api/[controller]")]
+    [ApiController]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;

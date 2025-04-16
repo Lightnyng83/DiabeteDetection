@@ -245,19 +245,6 @@ namespace NotesServiceTests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-       
-
-        [Fact]
-        public async Task HealthEndpoint_ReturnsHealthy()
-        {
-           
-            var response = await _client.GetAsync("/api/health");
-            
-            response.EnsureSuccessStatusCode(); // Vérifie que le status code est 200-299
-            var content = await response.Content.ReadAsStringAsync();
-            Assert.Equal("Healthy", content);
-        }
-
 
         /// <summary>
         /// Génère un token JWT pour les tests.

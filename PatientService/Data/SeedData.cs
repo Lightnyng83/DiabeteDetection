@@ -83,39 +83,39 @@ namespace PatientService.Data
                 {
                     context.Patients.Add(new Patient
                     {
-                        Nom = "Test",
-                        Prenom = "TestNone",
+                        Nom = "TestNone",
+                        Prenom = "Test",
                         DateNaissance = new DateOnly(1996, 12, 31),
                         Adresse = "1 Brookside St",
                         Telephone = "100-222-3333",
-                        Genre = 0
+                        Genre = 1
                     });
                     context.Patients.Add(new Patient
                     {
-                        Nom = "Test",
-                        Prenom = "TestBorderline",
+                        Nom = "TestBorderline",
+                        Prenom = "Test",
                         DateNaissance = new DateOnly(1945, 06, 24),
                         Adresse = "2 High St",
                         Telephone = "200-333-4444",
-                        Genre = 1
+                        Genre = 0
                     });
                     context.Patients.Add(new Patient
                     {
-                        Nom = "Test",
-                        Prenom = "TestInDanger",
+                        Nom = "TestInDanger",
+                        Prenom = "Test",
                         DateNaissance = new DateOnly(2004, 06, 18),
                         Adresse = "3 Club Road",
                         Telephone = "300-444-5555",
-                        Genre = 1
+                        Genre = 0
                     });
                     context.Patients.Add(new Patient
                     {
-                        Nom = "Test",
-                        Prenom = "TestEarlyOnset",
+                        Nom = "TestEarlyOnset",
+                        Prenom = "Test",
                         DateNaissance = new DateOnly(2002, 06, 28),
                         Adresse = "4 Valley Dr",
                         Telephone = "400-555-6666",
-                        Genre = 0
+                        Genre = 1
                     });
                     await context.SaveChangesAsync();
                 }

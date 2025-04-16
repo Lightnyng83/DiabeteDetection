@@ -53,7 +53,7 @@ namespace NotesService.Data
             {
                 foreach (var patient in patients)
                 {
-                    switch (patient.Prenom)
+                    switch (patient.Nom)
                     {
                         case "TestNone":
                             var note1 = new Note

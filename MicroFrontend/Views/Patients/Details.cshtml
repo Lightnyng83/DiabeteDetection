@@ -91,7 +91,7 @@ else
         @foreach (var note in Model.Notes)
         {
             <li>
-                <strong>@note.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</strong> – <pre style="white-space: pre-wrap; word-break: break-word;">@note.Content</pre>
+                <strong>@note.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</strong> <pre>@note.Content</pre>
             </li>
         }
     </ul>
@@ -102,10 +102,3 @@ else
     }
 }
 
-<style>
-    .bg-orange {
-        background-color: orange;
-        color: white;
-    }
-
-</style>

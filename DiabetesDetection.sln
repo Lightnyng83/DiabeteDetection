@@ -23,10 +23,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotesServiceTests", "NotesServiceTests\NotesServiceTests.csproj", "{3A03E42F-02AA-4635-B60A-7C52BCB719D8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{6504E23C-9A10-41B7-8D15-E3D3752A518F}"
-	ProjectSection(SolutionItems) = preProject
-		NotesService\appsettings.Development.json = NotesService\appsettings.Development.json
-		NotesService\appsettings.json = NotesService\appsettings.json
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiskReportService", "RiskReportService\RiskReportService.csproj", "{A4BAD85A-079A-4F6B-ABDE-ECDE96FFFAA3}"
 EndProject

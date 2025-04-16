@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RiskReportService.Models;
 using RiskReportService.Services.Interfaces;
 
 namespace RiskReportService.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class RiskController : ControllerBase
     {

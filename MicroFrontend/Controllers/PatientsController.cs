@@ -205,6 +205,8 @@ namespace MicroFrontend.Controllers
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             _notesServiceClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            _httpRiskClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             return true;
         }
 

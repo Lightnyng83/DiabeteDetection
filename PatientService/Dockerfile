@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y curl
 # Build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY Configuration/ Configuration/
 
 COPY ["PatientService/PatientService.csproj", "PatientService/"]
 COPY ["Utilitaires/Utilitaires.csproj", "Utilitaires/"]

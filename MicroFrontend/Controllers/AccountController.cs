@@ -10,9 +10,10 @@ namespace MicroFrontend.Controllers
     {
         private readonly HttpClient _httpClient;
 
-        public AccountController(HttpClient httpClient)
+        public AccountController(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient("ApiClient");
+            Console.WriteLine($"[DEBUG] BaseAddress: {_httpClient.BaseAddress}");
         }
 
         // GET: /Account/Login
@@ -32,14 +33,17 @@ namespace MicroFrontend.Controllers
             }
 
             // Appel à l'API de connexion
-            var response = await _httpClient.PostAsJsonAsync("https://localhost:7090/api/account/login", model);
+            Console.WriteLine($"[DEBUG] BaseAddress : {_httpClient.BaseAddress}");
+            Console.WriteLine($"[DEBUG] Appel de l'API: {_httpClient.BaseAddress}account/login");
+
+            var response = await _httpClient.PostAsJsonAsync("account/login", model);
             if (response.IsSuccessStatusCode)
             {
                 var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                var token = loginResponse.Token;
+                var token = loginResponse!.Token;
 
                 // Stocker le token dans la Session 
-                HttpContext.Session.SetString("Token", token);
+                HttpContext.Session.SetString("Token", token!);
 
                 // Redirection vers la page des patients
                 return RedirectToAction("Index", "Patients");

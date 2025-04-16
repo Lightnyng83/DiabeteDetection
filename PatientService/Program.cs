@@ -6,16 +6,28 @@ using Microsoft.IdentityModel.Tokens;
 using PatientService.Data;
 using PatientService.Models;
 using PatientService.Security;
-using Microsoft.AspNetCore.Builder; // Assure-toi d'avoir ce using
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 
-var builder = WebApplication.CreateBuilder(args);
-
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    WebRootPath = "wwwroot",
+    ApplicationName = typeof(Program).Assembly.FullName,
+});
+builder.WebHost.UseUrls("http://*:8080");
 // Utilise builder.Configuration directement
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (!Program.IsIntegrationTest) // Si on est pas en test => donc en prod
     {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null);
+        });
     }
 });
 
@@ -29,7 +41,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
-var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+var key = Encoding.ASCII.GetBytes(jwtSettings!.SecretKey);
 
 // Configurer l'authentification JWT
 builder.Services.AddAuthentication(options =>
@@ -81,14 +93,16 @@ builder.Services.AddCors(options =>
         });
 });
 
-
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("keys"))
+    .SetApplicationName("DiabeteDetection");
 #endregion
 
 builder.Services.AddRouting();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-
+app.UseHttpsRedirection();
 app.UseRouting(); // D'abord le routage
 app.UseCors("AllowFront"); // Puis CORS si nécessaire
 app.UseAuthentication(); // Puis l'authentification
@@ -104,17 +118,30 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        // Définir un mot de passe fort pour l'utilisateur de test
+        var context = services.GetRequiredService<ApplicationDbContext>();
+
+        // Nouvelle version propre
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            Console.WriteLine("[INFO] Migrations en attente... Application des migrations.");
+            context.Database.Migrate();
+        }
+        else
+        {
+            Console.WriteLine("[INFO] Pas de migration en attente.");
+        }
+
         await SeedData.InitializeAsync(services, "Test@12345");
     }
     catch (Exception ex)
     {
-        // Gère l'exception en fonction de tes besoins (log, etc.)
         Console.WriteLine("Erreur lors du seed de données: " + ex.Message);
     }
 }
 
 #endregion
+
+
 
 app.Run();
 

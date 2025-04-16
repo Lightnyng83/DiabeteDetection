@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PatientService.Models;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PatientService.Data
 {
@@ -11,54 +12,76 @@ namespace PatientService.Data
     {
         public static async Task InitializeAsync(IServiceProvider serviceProvider, string testUserPassword)
         {
-            // Créer un scope pour obtenir les services
             using (var scope = serviceProvider.CreateScope())
             {
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                int retries = 10; // 10 essais
+                while (retries > 0)
+                {
+                    try
+                    {
+                        Console.WriteLine("Tentative de connexion à SQL Server...");
+                        Console.WriteLine("Connexion réussie à SQL Server.");
+                        break; // Succès
+                    }
+                    catch (Exception ex)
+                    {
+                        retries--;
+                        Console.WriteLine($"Erreur de connexion SQL : {ex.Message}. Tentatives restantes : {retries}");
+                        await Task.Delay(3000); // Attendre 3 secondes avant d'essayer à nouveau
+                    }
+                }
+
+                if (retries == 0)
+                {
+                    throw new Exception("Impossible de se connecter à SQL Server après plusieurs tentatives.");
+                }
+
                 #region Create User
 
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-                //Création d'un rôle 'Doctor' s'il n'existe pas déjà
-                var doctorRole = "Doctor";
-                if (!await roleManager.RoleExistsAsync(doctorRole))
+                if (!await context.Roles.AnyAsync())
                 {
-                    await roleManager.CreateAsync(new IdentityRole(doctorRole));
-                }
-
-                // Vérifier si l'utilisateur de test existe déjà
-                var testUserName = "testuser";
-                var testUser = await userManager.FindByNameAsync(testUserName);
-                if (testUser == null)
-                {
-                    testUser = new ApplicationUser
+                    var doctorRole = "Doctor";
+                    if (!await roleManager.RoleExistsAsync(doctorRole))
                     {
-                        UserName = testUserName,
-                        Email = "testuser@example.com"
-                    };
-
-                    var result = await userManager.CreateAsync(testUser, testUserPassword);
-                    if (result.Succeeded)
-                    {
-                        // Ajouter l'utilisateur au rôle 'Doctor'
-                        await userManager.AddToRoleAsync(testUser, doctorRole);
+                        await roleManager.CreateAsync(new IdentityRole(doctorRole));
                     }
-                    else
+
+                    var testUserName = "testuser";
+                    var testUser = await userManager.FindByNameAsync(testUserName);
+                    if (testUser == null)
                     {
-                        //La création de l'utilisateur a échoué. Vérifie les messages d'erreur.
-                        throw new Exception("La création de l'utilisateur de test a échoué : " + string.Join(", ", result.Errors));
+                        testUser = new ApplicationUser
+                        {
+                            UserName = testUserName,
+                            Email = "testuser@example.com"
+                        };
+
+                        var result = await userManager.CreateAsync(testUser, testUserPassword);
+                        if (result.Succeeded)
+                        {
+                            await userManager.AddToRoleAsync(testUser, doctorRole);
+                        }
+                        else
+                        {
+                            throw new Exception("La création de l'utilisateur de test a échoué : " + string.Join(", ", result.Errors));
+                        }
                     }
                 }
+
+               
 
                 #endregion
 
                 #region Add Patients
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                var nom = dbContext.Patients.FirstOrDefault(p => p.Nom == "Test");
+                var nom = context.Patients.FirstOrDefault(p => p.Nom == "Test");
                 if (nom == null)
                 {
-                    dbContext.Patients.Add(new Patient
+                    context.Patients.Add(new Patient
                     {
                         Nom = "Test",
                         Prenom = "TestNone",
@@ -67,7 +90,7 @@ namespace PatientService.Data
                         Telephone = "100-222-3333",
                         Genre = 0
                     });
-                    dbContext.Patients.Add(new Patient
+                    context.Patients.Add(new Patient
                     {
                         Nom = "Test",
                         Prenom = "TestBorderline",
@@ -76,7 +99,7 @@ namespace PatientService.Data
                         Telephone = "200-333-4444",
                         Genre = 1
                     });
-                    dbContext.Patients.Add(new Patient
+                    context.Patients.Add(new Patient
                     {
                         Nom = "Test",
                         Prenom = "TestInDanger",
@@ -85,7 +108,7 @@ namespace PatientService.Data
                         Telephone = "300-444-5555",
                         Genre = 1
                     });
-                    dbContext.Patients.Add(new Patient
+                    context.Patients.Add(new Patient
                     {
                         Nom = "Test",
                         Prenom = "TestEarlyOnset",
@@ -94,7 +117,7 @@ namespace PatientService.Data
                         Telephone = "400-555-6666",
                         Genre = 0
                     });
-                    await dbContext.SaveChangesAsync();
+                    await context.SaveChangesAsync();
                 }
 
                 #endregion

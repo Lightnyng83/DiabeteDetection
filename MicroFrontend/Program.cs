@@ -1,15 +1,36 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Ajoute les services MVC
 builder.Services.AddControllersWithViews();
 
-// Configure HttpClient
 builder.Services.AddHttpClient("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7090/api/");
+    // On récupère la valeur depuis la configuration,
+    // qui sera surchargée par les variables d'environnement en Docker.
+    var baseUrl = builder.Configuration["AccountApi:BaseUrl"];
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        baseUrl = "https://localhost:7090/api/"; // Valeur par défaut en local
+    }
+    client.BaseAddress = new Uri(baseUrl);
 });
+
+builder.Services.AddHttpClient("NotesService", client =>
+{
+    var baseUrl = builder.Configuration["NotesApi:BaseUrl"];
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        baseUrl = "https://localhost:7041/api/"; // Valeur par défaut en local
+    }
+    client.BaseAddress = new Uri(baseUrl);
+});
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("keys"))
+    .SetApplicationName("DiabeteDetection");
 
 // Configuration de la session
 builder.Services.AddDistributedMemoryCache();
@@ -48,6 +69,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
+
 
 app.Run();

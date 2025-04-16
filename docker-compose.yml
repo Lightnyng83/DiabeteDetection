@@ -1,27 +1,107 @@
-version: '3.4'
+version: '3.9'
+
+networks:
+  diabete-net:
+    driver: bridge
+
 services:
   patientservice:
-    build: ./PatientService
+    build:
+      context: .
+      dockerfile: PatientService/Dockerfile
     ports:
-      - "5000:80"
+      - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-  ocelotgateway:
-    build: ./OcelotGateway
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - diabete-net
+    volumes:
+      - ./Configuration:/app/Configuration
+
+  notesservice:
+    build:
+      context: .
+      dockerfile: NotesService/Dockerfile
     ports:
-      - "5001:80"
+      - "5003:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      patientservice:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    networks:
+      - diabete-net
+    volumes:
+      - ./Configuration:/app/Configuration
+
   microfrontend:
-    build: ./MicroFrontend
+    build:
+      context: .
+      dockerfile: MicroFrontend/Dockerfile
     ports:
-      - "5002:80"
+      - "5002:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - AccountApi__BaseUrl=http://patientservice:8080/api/
+      - NotesApi__BaseUrl=http://notesservice:8080/api/
+    depends_on:
+      - patientservice
+      - notesservice
+    networks:
+      - diabete-net
+
+  ocelotgateway:
+    build:
+      context: .
+      dockerfile: OcelotGateway/Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - patientservice
+      - notesservice
+    networks:
+      - diabete-net
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
     environment:
       SA_PASSWORD: "CnUJ3ge0JAnwUH!A6ZP@r3&ERaW#8z^w"
       ACCEPT_EULA: "Y"
+      MSSQL_TLS_VERSION: "1.2"
     ports:
       - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/1433"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+    networks:
+      - diabete-net
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    command: ["mongod", "--bind_ip_all"]
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - diabete-net
+
+volumes:
+  sqlserverdata:
+  mongodb_data_container:

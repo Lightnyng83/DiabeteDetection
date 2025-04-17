@@ -11,11 +11,6 @@ builder.Services.AddHttpClient("ApiClient", client =>
     client.BaseAddress = new Uri(gatewayUrl);
 });
 
-
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("keys"))
-    .SetApplicationName("DiabeteDetection");
-
 // Configuration de la session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

@@ -88,9 +88,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("keys"))
-    .SetApplicationName("DiabeteDetection");
 #endregion
 
 builder.Services.AddRouting();

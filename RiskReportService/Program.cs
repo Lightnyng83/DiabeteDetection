@@ -23,7 +23,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Host.ConfigureLogging(logging =>
 {
-    logging.SetMinimumLevel(LogLevel.Debug);
+    logging.SetMinimumLevel(LogLevel.Warning);
 });
 
 

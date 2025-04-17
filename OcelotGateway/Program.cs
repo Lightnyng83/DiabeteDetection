@@ -10,6 +10,11 @@ builder.Configuration.AddJsonFile("Configuration/ocelot.json", optional: false, 
 builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Requête reçue par Ocelot : {context.Request.Path}");
+    await next();
+});
 
 await app.UseOcelot();
 

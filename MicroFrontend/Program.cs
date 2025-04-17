@@ -5,38 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Ajoute les services MVC
 builder.Services.AddControllersWithViews();
-
+var gatewayUrl = builder.Configuration["Gateway:BaseUrl"];
 builder.Services.AddHttpClient("ApiClient", client =>
 {
-    // On récupère la valeur depuis la configuration,
-    // qui sera surchargée par les variables d'environnement en Docker.
-    var baseUrl = builder.Configuration["AccountApi:BaseUrl"];
-    if (string.IsNullOrEmpty(baseUrl))
-    {
-        baseUrl = "https://localhost:7090/api/"; // Valeur par défaut en local
-    }
-    client.BaseAddress = new Uri(baseUrl);
+    client.BaseAddress = new Uri(gatewayUrl);
 });
 
-builder.Services.AddHttpClient("NotesService", client =>
-{
-    var baseUrl = builder.Configuration["NotesApi:BaseUrl"];
-    if (string.IsNullOrEmpty(baseUrl))
-    {
-        baseUrl = "https://localhost:7041/api/"; // Valeur par défaut en local
-    }
-    client.BaseAddress = new Uri(baseUrl);
-});
-
-builder.Services.AddHttpClient("RiskService", client =>
-{
-    var baseUrl = builder.Configuration["RiskReportApi:BaseUrl"];
-    if (string.IsNullOrEmpty(baseUrl))
-    {
-        baseUrl = "https://localhost:7089/api/"; // Valeur par défaut en local
-    }
-    client.BaseAddress = new Uri(baseUrl);
-});
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("keys"))

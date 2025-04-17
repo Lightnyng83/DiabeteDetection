@@ -1,6 +1,19 @@
 {
   "Routes": [
     {
+      "UpstreamPathTemplate": "/api/account/{everything}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/account/{everything}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "patientservice",
+          "Port": 8080
+        }
+      ],
+      "DownstreamScheme": "http"
+    },
+
+    {
       "DownstreamPathTemplate": "/api/patients/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -9,12 +22,12 @@
           "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/patients/{everything}",
+      "UpstreamPathTemplate": "/api/patients/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     },
     {
       "DownstreamPathTemplate": "/api/notes/{everything}",
-      "UpstreamPathTemplate": "/notes/{everything}",
+      "UpstreamPathTemplate": "/api/notes/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -29,7 +42,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "riskservice",
+          "Host": "riskreportservice",
           "Port": 8080
         }
       ],
@@ -38,6 +51,7 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5001"
+    "BaseUrl": "http://localhost:5001",
+    "RequestIdKey": "Oc-RequestId"
   }
 }

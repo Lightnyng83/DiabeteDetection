@@ -11,15 +11,13 @@ namespace MicroFrontend.Controllers
     public class PatientsController : Controller
     {
         private readonly HttpClient _httpPatientClient;
-        private readonly HttpClient _notesServiceClient;
-        private readonly HttpClient _httpRiskClient;
+
 
 
         public PatientsController(IHttpClientFactory httpClientFactory)
         {
             _httpPatientClient = httpClientFactory.CreateClient("ApiClient");
-            _notesServiceClient = httpClientFactory.CreateClient("NotesService");
-            _httpRiskClient = httpClientFactory.CreateClient("RiskService");
+
         }
 
         public async Task<IActionResult> Index()
@@ -54,12 +52,12 @@ namespace MicroFrontend.Controllers
             }
 
             // Récupère les notes du patient (API NotesService)
-            var notes = await _notesServiceClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
+            var notes = await _httpPatientClient.GetFromJsonAsync<List<NoteViewModel>>($"notes/patient/{id}");
 
 
             // Récupère le iveau de risque du patient (API RiskService)
 
-            var risk = await _httpRiskClient.GetFromJsonAsync<RiskLevel>($"risk/{id}");
+            var risk = await _httpPatientClient.GetFromJsonAsync<RiskLevel>($"risk/{id}");
 
             var viewModel = new PatientDetailViewModel
             {
@@ -113,7 +111,7 @@ namespace MicroFrontend.Controllers
                 };
 
                 // Appeler l'API notes uniquement si du contenu a été fourni
-                responseNote = await _notesServiceClient.PostAsJsonAsync("notes", note);
+                responseNote = await _httpPatientClient.PostAsJsonAsync("notes", note);
             }
 
             // Si l'appel à l'API patient a réussi et que, soit l'appel aux notes n'a pas été effectué
@@ -203,10 +201,7 @@ namespace MicroFrontend.Controllers
             // Ajouter le token dans le header Authorization
             _httpPatientClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            _notesServiceClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            _httpRiskClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
             return true;
         }
 

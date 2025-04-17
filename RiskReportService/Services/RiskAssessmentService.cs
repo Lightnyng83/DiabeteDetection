@@ -43,8 +43,8 @@ namespace RiskReportService.Services
             if (patient.DateNaissance > DateTime.Today.AddYears(-age)) age--;
             Console.WriteLine($"[DEBUG] Patient: Date de naissance : {patient.DateNaissance}");
             Console.WriteLine($"[DEBUG] Patient: Année de naissance : {patient.DateNaissance.Year}");
-
             Console.WriteLine($"[DEBUG] Patient: {patient.Prenom}, Age: {age}, Genre: {patient.Genre}");
+
             var triggerCount = notes
                 .Where(n => !string.IsNullOrWhiteSpace(n.Content))
                 .Sum(note =>
@@ -52,7 +52,6 @@ namespace RiskReportService.Services
                         CountOccurrences(note.Content, trigger)
                     )
                 );
-
 
             // Évaluation du risque
             if (triggerCount == 0)

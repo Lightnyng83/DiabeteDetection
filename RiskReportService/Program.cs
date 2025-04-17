@@ -6,20 +6,26 @@ using Microsoft.IdentityModel.Tokens;
 using RiskReportService.Security;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var gatewayUrl = builder.Configuration["Gateway:BaseUrl"];
+builder.Services.AddHttpClient<IPatientClient, PatientClient>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
+builder.Services.AddHttpClient<INoteClient, NoteClient>(client =>
+{
+    client.BaseAddress = new Uri(gatewayUrl);
+});
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configurer les HttpClients
-builder.Services.AddHttpClient<IPatientClient, PatientClient>(client =>
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Host.ConfigureLogging(logging =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:PatientApi"]!);
+    logging.SetMinimumLevel(LogLevel.Debug);
 });
-builder.Services.AddHttpClient<INoteClient, NoteClient>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["Services:NotesApi"]!);
-});
+
 
 // Injection du service métier
 builder.Services.AddScoped<IRiskAssessmentService, RiskAssessmentService>();

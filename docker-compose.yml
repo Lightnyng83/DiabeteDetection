@@ -41,6 +41,8 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_started
+      ocelotgateway:
+        condition: service_started
     networks:
       - diabete-net
     volumes:
@@ -88,7 +90,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - patientservice
-      - notesservice
     networks:
       - diabete-net
 

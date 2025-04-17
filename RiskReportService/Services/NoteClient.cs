@@ -24,7 +24,7 @@ namespace RiskReportService.Services
         {
             AuthenticateClient(_service);
 
-            var response = await _httpClient.GetAsync($"api/notes/patient/{patientId}");
+            var response = await _httpClient.GetAsync($"notes/patient/{patientId}");
 
             if (!response.IsSuccessStatusCode)
             {

@@ -19,10 +19,12 @@ builder.Services.Configure<MongoDbSettings>(
 
 
 #endregion
+var gatewayUrl = builder.Configuration["Gateway:BaseUrl"];
 builder.Services.AddHttpClient<PatientApiService>(client =>
 {
-    client.BaseAddress = new Uri("http://patientservice:8080"); // <== l'url dockerisé de PatientService
+    client.BaseAddress = new Uri(gatewayUrl);
 });
+
 
 
 builder.Services.AddControllers();

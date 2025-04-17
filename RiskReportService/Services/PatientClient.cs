@@ -22,7 +22,7 @@ namespace RiskReportService.Services
         public async Task<PatientDto?> GetPatientByIdAsync(Guid id)
         {
             AuthenticateClient(_service);
-            var response = await _httpClient.GetAsync($"api/patients/{id}");
+            var response = await _httpClient.GetAsync($"patients/{id}");
 
             if (!response.IsSuccessStatusCode)
             {

@@ -11,28 +11,23 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using notesAlias::NotesService.Models;
+using Commons.Security.Service;
 
 namespace NotesServiceTests
 {
-    public class NotesControllerTests : IClassFixture<CustomWebApplicationFactory>
+    public class NotesControllerTests : IClassFixture<CustomWebApplicationFactory>, IClassFixture<TokenServiceFixture>
     {
         private readonly HttpClient _client;
+        private readonly ITokenService _tokenService;
 
-        public NotesControllerTests(CustomWebApplicationFactory factory)
+        public NotesControllerTests(CustomWebApplicationFactory factory, TokenServiceFixture fixture)
         {
             _client = factory.CreateClient();
             _client.BaseAddress = new Uri("https://localhost:7041/");
+            _tokenService = fixture.TokenService;
         }
 
-        /// <summary>
-        /// Authentifie le client en injectant un token JWT dans le header.
-        /// </summary>
-        private void AuthenticateClient()
-        {
-            var token = GenerateTestJwtToken();
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        }
-
+        
         [Fact]
         public async Task GetNotesForPatient_Unauthorized_WhenNoTokenProvided()
         {
@@ -47,7 +42,7 @@ namespace NotesServiceTests
         public async Task GetNotesForPatient_ReturnsOk_WhenAuthenticated()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client,60);
             // Utiliser un patientId arbitraire (ici aucun note n'existe forcément, mais l'endpoint doit renvoyer 200 OK).
             var patientId = Guid.NewGuid();
 
@@ -62,7 +57,7 @@ namespace NotesServiceTests
         public async Task CreateNote_ReturnsCreated_WhenValid()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var note = new Note
             {
                 PatientId = Guid.NewGuid(),
@@ -84,7 +79,7 @@ namespace NotesServiceTests
         public async Task CreateNote_ReturnsBadRequest_WhenInvalid()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             // Note invalide (PatientId vide)
             var note = new Note
             {
@@ -103,7 +98,7 @@ namespace NotesServiceTests
         public async Task GetNote_ReturnsOk_WhenValid()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var note = new Note
             {
                 PatientId = Guid.NewGuid(),
@@ -128,7 +123,7 @@ namespace NotesServiceTests
         public async Task GetNote_ReturnsNotFound_WhenNonExistent()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var nonExistentId = "nonexistentid";
 
             // Act
@@ -142,7 +137,7 @@ namespace NotesServiceTests
         public async Task UpdateNote_ReturnsBadRequest_WhenIdMismatch()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var note = new Note
             {
                 PatientId = Guid.NewGuid(),
@@ -168,7 +163,7 @@ namespace NotesServiceTests
         public async Task UpdateNote_ReturnsNoContent_WhenSuccessful()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var note = new Note
             {
                 PatientId = Guid.NewGuid(),
@@ -210,7 +205,7 @@ namespace NotesServiceTests
         public async Task DeleteNote_ReturnsNoContent_WhenSuccessful()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var note = new Note
             {
                 PatientId = Guid.NewGuid(),
@@ -236,47 +231,13 @@ namespace NotesServiceTests
         public async Task DeleteNote_ReturnsNotFound_WhenNoteDoesNotExist()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
 
             // Act
             var response = await _client.DeleteAsync("/api/notes/1");
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-
-        /// <summary>
-        /// Génère un token JWT pour les tests.
-        /// </summary>
-        /// <returns>Token JWT sous forme de chaîne</returns>
-        private string GenerateTestJwtToken()
-        {
-            // Ces valeurs doivent correspondre à celles de la configuration de prod (appsettings.json)
-            var secretKey = "MySuperSecretKey_12345MySuperSecretKey!";
-            var issuer = "DiabeteDetection";
-            var audience = "DiabeteDetectionUsers";
-            var expiryMinutes = 60;
-
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
-                    new Claim(ClaimTypes.Name, "testuser")
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(expiryMinutes),
-                Issuer = issuer,
-                Audience = audience,
-                SigningCredentials = credentials
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
     }
 }

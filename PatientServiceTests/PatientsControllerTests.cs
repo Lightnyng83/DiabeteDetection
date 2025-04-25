@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
+using Commons.Security.Service;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.IdentityModel.Tokens;
 using PatientService;
@@ -12,19 +13,15 @@ using Xunit;
 
 namespace PatientServiceTests
 {
-    public class PatientsControllerTests : IClassFixture<CustomWebApplicationFactory>
+    public class PatientsControllerTests : IClassFixture<CustomWebApplicationFactory>, IClassFixture<TokenServiceFixture>
     {
         private readonly HttpClient _client;
+        private readonly ITokenService _tokenService;
 
-        public PatientsControllerTests(CustomWebApplicationFactory factory)
+        public PatientsControllerTests(CustomWebApplicationFactory factory, TokenServiceFixture fixture)
         {
             _client = factory.CreateClient();
-        }
-
-        private void AuthenticateClient()
-        {
-            var token = GenerateTestJwtToken();
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            _tokenService = fixture.TokenService;
         }
 
         [Fact]
@@ -41,7 +38,7 @@ namespace PatientServiceTests
         public async Task GetPatients_ReturnsOk_WhenAuthenticated()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client,60);
 
             // Act
             var response = await _client.GetAsync("/api/patients");
@@ -54,7 +51,7 @@ namespace PatientServiceTests
         public async Task PostPatient_CreatesPatient_WhenValid()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var patient = new Patient
             {
                 Nom = "Dupont",
@@ -80,7 +77,7 @@ namespace PatientServiceTests
         public async Task GetPatient_ReturnsNotFound_WhenIdIsInvalid()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
 
             // Act
             var response = await _client.GetAsync($"/api/patients/{Guid.NewGuid()}");
@@ -93,7 +90,7 @@ namespace PatientServiceTests
         public async Task PutPatient_ReturnsBadRequest_WhenIdMismatch()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var patient = new Patient
             {
                 Id = Guid.NewGuid(),
@@ -118,7 +115,7 @@ namespace PatientServiceTests
         public async Task PutPatient_ReturnsNoContent_WhenSuccessful()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var patient = new Patient
             {
                 Nom = "Update",
@@ -147,7 +144,7 @@ namespace PatientServiceTests
         public async Task DeletePatient_ReturnsNoContent_WhenSuccessful()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
             var patient = new Patient
             {
                 Nom = "Suppression",
@@ -172,7 +169,7 @@ namespace PatientServiceTests
         public async Task DeletePatient_ReturnsNotFound_WhenIdDoesNotExist()
         {
             // Arrange
-            AuthenticateClient();
+            _tokenService.AuthenticateClient(_client, 60);
 
             // Act
             var response = await _client.DeleteAsync($"/api/patients/{Guid.NewGuid()}");
@@ -181,33 +178,5 @@ namespace PatientServiceTests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        private string GenerateTestJwtToken()
-        {
-            // Ces valeurs doivent correspondre à celles de la configuration de prod (appsettings.json)
-            var secretKey = "MySuperSecretKey_12345MySuperSecretKey!"; 
-            var issuer = "DiabeteDetection";
-            var audience = "DiabeteDetectionUsers";
-            var expiryMinutes = 60;
-
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
-                    new Claim(ClaimTypes.Name, "testuser")
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(expiryMinutes),
-                Issuer = issuer,
-                Audience = audience,
-                SigningCredentials = credentials
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
     }
 }

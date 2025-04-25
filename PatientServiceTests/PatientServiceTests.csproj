@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Projet 10 New\Utilitaires\Commons.csproj" />
     <ProjectReference Include="..\MicroFrontend\MicroFrontend.csproj" />
     <ProjectReference Include="..\PatientService\PatientService.csproj" />
   </ItemGroup>

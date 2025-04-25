@@ -1,4 +1,5 @@
 ﻿extern alias notesAlias;
+using Commons.Security.Service;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ namespace NotesServiceTests
             {
                 //Supprime l'enregistrement existant du client MongoDB (s'il existe)
                 services.RemoveAll<IMongoClient>();
+                services.AddScoped<ITokenService, TokenService>();
 
                 // Configure le client MongoDB pour les tests
                 services.AddSingleton<MongoDbSettings>();

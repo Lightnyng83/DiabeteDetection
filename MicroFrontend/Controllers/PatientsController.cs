@@ -5,27 +5,26 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using MicroFrontend.Models;
 using System.Net;
+using Commons.Security.Service;
 
 namespace MicroFrontend.Controllers
 {
     public class PatientsController : Controller
     {
         private readonly HttpClient _httpPatientClient;
+        private readonly ITokenService _tokenService;
 
 
 
-        public PatientsController(IHttpClientFactory httpClientFactory)
+        public PatientsController(IHttpClientFactory httpClientFactory,ITokenService tokenService)
         {
             _httpPatientClient = httpClientFactory.CreateClient("ApiClient");
-
+            _tokenService = tokenService;
         }
 
         public async Task<IActionResult> Index()
         {
-            if (!TryAddTokenToHeader())
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            _tokenService.AuthenticateClient(_httpPatientClient, 60);
 
             // Appel à l'API pour récupérer la liste des patients
             List<PatientViewModel>? patients = await _httpPatientClient.GetFromJsonAsync<List<PatientViewModel>>("patients");
@@ -39,10 +38,8 @@ namespace MicroFrontend.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-            if (!TryAddTokenToHeader())
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            _tokenService.AuthenticateClient(_httpPatientClient, 60);
+
 
             // Récupère le patient (API Patients)
             var patient = await _httpPatientClient.GetFromJsonAsync<PatientViewModel>($"patients/{id}");
@@ -74,10 +71,8 @@ namespace MicroFrontend.Controllers
         [HttpPost]
         public async Task<IActionResult> Details(PatientDetailViewModel model)
         {
-            if (!TryAddTokenToHeader())
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            _tokenService.AuthenticateClient(_httpPatientClient, 60);
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -135,10 +130,8 @@ namespace MicroFrontend.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            if (!TryAddTokenToHeader())
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            _tokenService.AuthenticateClient(_httpPatientClient, 60);
+
 
             return View();
         }
@@ -146,10 +139,8 @@ namespace MicroFrontend.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(PatientViewModel patient)
         {
-            if (!TryAddTokenToHeader())
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            _tokenService.AuthenticateClient(_httpPatientClient, 60);
+
             if (ModelState.IsValid)
             {
                 // Appel à l'API pour créer un nouveau patient
@@ -170,10 +161,8 @@ namespace MicroFrontend.Controllers
         [HttpPost]
         public async Task<IActionResult> DeletePatient(Guid id)
         {
-            if (!TryAddTokenToHeader())
-            {
-                return RedirectToAction("Login", "Account");
-            }
+            _tokenService.AuthenticateClient(_httpPatientClient, 60);
+
             // Appel à l'API pour supprimer un patient
             var response = await _httpPatientClient.DeleteAsync($"patients/{id}");
             if (response.IsSuccessStatusCode)

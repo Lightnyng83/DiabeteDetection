@@ -11,11 +11,9 @@ namespace Commons.Security
             this IServiceCollection services,
             IConfiguration config)
         {
-            // On récupère la section "JwtSettings" et on la lie au POCO  
             var jwtSection = config.GetSection("JwtSettings");
             services.Configure<JwtSettings>(options => jwtSection.Bind(options));
 
-            // Enregistrement de votre ITokenService/TokenService communs  
             services.AddSingleton<ITokenService, TokenService>();
 
             return services;

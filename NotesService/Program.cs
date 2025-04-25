@@ -8,6 +8,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson;
 using NotesService.Security;
 using NotesService.Data;
+using Commons.Security.Service;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,9 +26,11 @@ builder.Services.AddHttpClient<PatientApiService>(client =>
     client.BaseAddress = new Uri(gatewayUrl);
 });
 
-
+builder.Services.Configure<Commons.Security.Model.JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<NoteService>();
 builder.Services.AddTransient<SeedMongoData>();
 builder.Services.AddHttpContextAccessor();

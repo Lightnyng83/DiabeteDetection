@@ -12,7 +12,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 COPY ["PatientService/PatientService.csproj", "PatientService/"]
-COPY ["Utilitaires/Utilitaires.csproj", "Utilitaires/"]
+COPY ["Utilitaires/Commons.csproj", "Utilitaires/"]
 
 RUN dotnet restore "PatientService/PatientService.csproj"
 

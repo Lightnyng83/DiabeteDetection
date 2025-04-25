@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Projet 10 New\Utilitaires\Commons.csproj" />
     <ProjectReference Include="..\MicroFrontend\MicroFrontend.csproj" />
     <ProjectReference Include="..\PatientService\PatientService.csproj" />
+    <ProjectReference Include="..\Utilitaires\Commons.csproj" />
   </ItemGroup>
 	<ItemGroup>
 		<None Update="..\PatientService\bin\$(Configuration)\net9.0\PatientService.deps.json">

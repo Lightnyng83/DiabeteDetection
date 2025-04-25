@@ -1,3 +1,4 @@
+using Commons.Security.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 
@@ -10,7 +11,8 @@ builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri(gatewayUrl);
 });
-
+builder.Services.Configure<Commons.Security.Model.JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
 // Configuration de la session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -19,6 +21,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // Configuration de l'authentification par cookie
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
